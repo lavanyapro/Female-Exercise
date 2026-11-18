@@ -2,7 +2,11 @@ name: Build APK
 
 on:
   push:
+    branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -18,7 +22,19 @@ jobs:
           gradle-version: "8.7"
       - name: Build release APK
         run: gradle :app:assembleRelease --no-daemon
+      - name: Name the APK
+        run: cp app/build/outputs/apk/release/app-release.apk PetitePower.apk
       - uses: actions/upload-artifact@v4
         with:
           name: PetitePower-apk
-          path: app/build/outputs/apk/release/*.apk
+          path: PetitePower.apk
+      # Public download link (no sign-in needed):
+      # https://github.com/<owner>/<repo>/releases/latest/download/PetitePower.apk
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Petite Power v1.0.${{ github.run_number }}
+          body: Tap PetitePower.apk below to download and install on your Android phone.
+          files: PetitePower.apk
+          make_latest: true

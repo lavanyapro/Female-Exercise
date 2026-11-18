@@ -20,7 +20,10 @@ It runs offline, keeps the screen on during workouts and saves your progress on 
 
 ## Install on your phone
 
-1. Copy the `.apk` to your phone (USB cable, Google Drive, or email it to yourself).
+**Direct download (open on your phone):**
+https://github.com/lavanyapro/Female-Exercise/releases/latest/download/PetitePower.apk
+
+1. Open the link above on your phone, or copy the `.apk` to it (USB cable, Google Drive, or email).
 2. Tap the file. Android asks to allow installs from that app (Files / Drive / Gmail). Allow it.
 3. Tap **Install**, then open **Petite Power** from your home screen.
 
