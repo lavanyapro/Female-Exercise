@@ -735,7 +735,7 @@ function renderDiet(){
   $("#p-diet").innerHTML=`
   <div class="diet-top">
    <div class="card" style="display:flex;flex-direction:column;gap:10px"><span class="eyebrow">Switch-On diet · 스위치온 다이어트</span><h2>4 weeks: protein shakes, one protein meal, then fasting days</h2>
-    <p class="muted" style="margin:0">The Korean Switch-On diet (Dr. Park Yong-woo) "switches on" fat burning: 3 weeks built on protein shakes plus one low-carb protein meal, with 24-hour fasts added from week 2, then week 4 rebuilds normal Korean meals. Versions online differ a little; this is the common schedule, adjusted so you can keep training.</p></div>
+    <p class="muted" style="margin:0">The Korean Switch-On diet (Dr. Park Yong-woo) "switches on" fat burning: 3 weeks built on protein shakes plus one low-carb protein meal, with 24-hour fasts added from week 2, then week 4 rebuilds normal Korean meals. This tracker follows the schedule in Noom's review of the diet.</p></div>
    <div class="card" style="display:flex;flex-direction:column;gap:10px"><h3>Your daily target</h3>
     <div class="stats"><div class="stat"><div class="v mono">${target}</div><div class="l">kcal / day from week 4</div></div><div class="stat"><div class="v mono">${Math.round(kg*1.6)}+</div><div class="l">g protein</div></div><div class="stat"><div class="v mono">2 L</div><div class="l">water / tea</div></div></div>
     <span class="muted" style="font-size:13px">Based on 149 cm, ${kg} kg, age 22 and 6 training days, minus a gentle 350 kcal for fat loss. Log your weight in Progress to update it.</span></div>
@@ -769,26 +769,36 @@ function renderDiet(){
 }
 /* Switch-On 4-week program (common published schedule; details vary between sources) */
 const SO_FAST={11:1,16:1,20:1,23:1,25:1,27:1};
+// Schedule follows Noom's "Korean Switch-On diet" review (Jun 2026). "Normal meal" = lean protein + vegetables.
+const NM="Normal meal: lean protein (fish, chicken, eggs, tofu) + non-starchy vegetables";
 function soPlan(d){
-  if(d>28)return{wk:5,title:"Maintenance",shakes:1,meal:"2 balanced K-food meals a day (full menu below) + 1 shake.",train:"Your normal 6-day training plan.",carbs:"Normal portions of multigrain rice, sweet potato and fruit.",fast:false,note:"Keep 1 × 24-hour fast and 1 × 14-hour overnight fast per week."};
-  if(SO_FAST[d])return{wk:d<=14?2:d<=21?3:4,title:"24-hour fast day",shakes:0,meal:"No food from last night's dinner until tonight's dinner. Water, barley tea, black coffee or green tea only. Break the fast with a shake, then a light protein meal.",train:"Rest, gentle walk or stretching only.",carbs:"None today",fast:true,note:"Move this fast to your Sunday or yoga day if it lands on a leg day."};
-  if(d<=3)return{wk:1,title:"Shake-only reset",shakes:4,meal:"No meal. If you're hungry, unlimited leafy vegetables (lettuce, cucumber, cabbage) with a little sesame oil.",train:"Light only: walking, yoga, stretching. Skip the gym plan these 3 days.",carbs:"No rice, flour, sugar, fruit, alcohol or caffeine drinks",fast:false};
-  if(d<=7)return{wk:1,title:"Shakes + 1 protein meal",shakes:3,meal:"1 low-carb protein lunch: fish, chicken, tofu or eggs with vegetables, namul and a little kimchi. No rice yet.",train:"Light gym: Pilates, yoga, machines at lighter weight.",carbs:"Still no rice, flour, sugar or fruit",fast:false};
-  if(d<=14)return{wk:2,title:"Shakes + 1 protein meal",shakes:2,meal:"1 protein meal (lunch) plus vegetables. ⅓ bowl multigrain rice is allowed.",train:"Back to your full training plan.",carbs:"Small sweet potato or a piece of fruit right after a workout",fast:false};
-  if(d<=21)return{wk:3,title:"Shakes + 1–2 protein meals",shakes:2,meal:"1 protein lunch + a light protein dinner. Small portions of rice, beans and lentils are fine.",train:"Full training plan.",carbs:"⅓–½ bowl multigrain rice, sweet potato, fruit after training",fast:false};
-  return{wk:4,title:"Rebuild normal meals",shakes:1,meal:"2 balanced K-food meals (use the full day menu below) + 1 shake.",train:"Full training plan.",carbs:"½ bowl multigrain rice per meal",fast:false};
+  const wk=d<=7?1:d<=14?2:d<=21?3:4;
+  if(d>28)return{wk:5,title:"After the 4 weeks",shakes:1,slots:[["Breakfast","Protein shake or a protein breakfast"],["Lunch",NM+" + ½ bowl multigrain rice"],["Dinner",NM]],eat:"Noom doesn't give a maintenance plan. Keep the habits: 14:10 eating window, protein at every meal, little added sugar or processed food.",train:"Your normal 6-day training plan.",fast:false};
+  if(SO_FAST[d])return{wk,title:"24-hour fast day",shakes:0,slots:[["All day","No meals. Water, green tea or herbal tea only."],["Tonight","Break the fast gently: a shake, then a small "+NM.toLowerCase()+"."]],eat:wk===2?"Week 2 has 1 fast.":wk===3?"Week 3 has 2 fasts on non-consecutive days.":"Week 4 has 3 fasts.",train:"Rest, walking or gentle yoga only.",fast:true,note:"Move this fast to your Sunday or yoga day if it lands on a gym day."};
+  if(d<=3)return{wk,title:"Gut reset: shakes only",shakes:4,probiotic:true,slots:[["Breakfast","Protein shake"],["Lunch","Protein shake"],["Snack","Protein shake"],["Dinner","Protein shake"]],eat:"Optional small amounts of plain yogurt, tofu and non-starchy vegetables (cabbage, cucumber, broccoli).",train:"At least 1 hour of walking. No hard gym sessions on these days.",fast:false};
+  if(d<=7)return{wk,title:"Gut reset: shakes + 1 meal",shakes:3,slots:[["Breakfast","Protein shake"],["Lunch",NM+" (low-carb)"],["Snack","Protein shake"],["Dinner","Protein shake"]],eat:"No caffeine, wheat or regular dairy this week. No rice yet.",train:"1 hour of walking daily, plus light gym work: Pilates, yoga, light machines.",fast:false};
+  if(d<=21)return{wk,title:wk===2?"More fasting":"Metabolic flexibility",shakes:2,slots:[["Breakfast","Protein shake"],["Lunch",NM+(wk===2?" + a small portion of multigrain rice":" + small rice, beans or legumes")],["Snack","Protein shake"],["Dinner","Carb-free meal: protein + vegetables, no rice"]],eat:wk===2?"New this week: small portions of multigrain rice, nuts, beans, unsalted cheese, non-dairy milk.":"New this week: a bit more high-fibre carbs and small amounts of low-sugar fruit.",train:"Full training plan, with HIIT at least 4 times a week.",fast:false};
+  return{wk,title:"Optimization",shakes:2,slots:[["Breakfast","Protein shake"],["Lunch",NM+" + ½ bowl multigrain rice"],["Snack","Protein shake"],["Dinner",NM]],eat:"New this week: 1 serving of fruit a day, and a banana or sweet potato before HIIT.",train:"Full training plan, with HIIT at least 4 times a week.",fast:false};
 }
 function soSection(){
-  const weeks=`<div style="overflow-x:auto"><table><thead><tr><th>Week</th><th>Shakes</th><th>Meals</th><th>24-h fasts</th><th>Carbs</th></tr></thead><tbody>
-   <tr><td><b>1</b> · days 1–3</td><td class="n">4 / day</td><td>none</td><td>–</td><td>none</td></tr>
-   <tr><td><b>1</b> · days 4–7</td><td class="n">3 / day</td><td>1 protein lunch</td><td>–</td><td>none</td></tr>
-   <tr><td><b>2</b></td><td class="n">2 / day</td><td>1 protein meal</td><td class="n">1</td><td>small, after training</td></tr>
-   <tr><td><b>3</b></td><td class="n">2 / day</td><td>1–2 protein meals</td><td class="n">2</td><td>small rice & beans</td></tr>
-   <tr><td><b>4</b></td><td class="n">1 / day</td><td>2 balanced meals</td><td class="n">3</td><td>½ bowl rice</td></tr></tbody></table></div>`;
-  const shake=`<div class="tip"><b>Shake recipe:</b> 1 scoop whey or soy protein (20–25 g protein) + 250 ml unsweetened soy milk or water. From week 2 you can add 1 tbsp misugaru or a handful of spinach. Pick a powder with under 5 g sugar per serving.</div>`;
+  const weeks=`<div style="overflow-x:auto"><table><thead><tr><th>Days</th><th>Breakfast</th><th>Lunch</th><th>Snack</th><th>Dinner</th><th>24-h fasts</th></tr></thead><tbody>
+   <tr><td><b>1–3</b></td><td>Shake</td><td>Shake</td><td>Shake</td><td>Shake</td><td>–</td></tr>
+   <tr><td><b>4–7</b></td><td>Shake</td><td>Normal meal</td><td>Shake</td><td>Shake</td><td>–</td></tr>
+   <tr><td><b>8–14</b></td><td>Shake</td><td>Normal meal</td><td>Shake</td><td>Carb-free meal</td><td class="n">1</td></tr>
+   <tr><td><b>15–21</b></td><td>Shake</td><td>Normal meal</td><td>Shake</td><td>Carb-free meal</td><td class="n">2</td></tr>
+   <tr><td><b>22–28</b></td><td>Shake</td><td>Normal meal</td><td>Shake</td><td>Normal meal</td><td class="n">3</td></tr></tbody></table></div>
+   <span class="muted" style="font-size:12.5px">"Normal meal" means lean protein + vegetables, not anything you like. Source: <a href="https://www.noom.com/blog/weight-management/korean-switch-on-diet-review/" target="_blank" rel="noopener" style="color:var(--accent)">Noom – Korean Switch-On diet review</a>. Noom notes the exact details vary between versions.</span>`;
+  const rules=`<div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>Every day, all 4 weeks</h3>
+   <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:14px">
+    <li>At least 8 cups (2 L) of water.</li><li>At least 6 hours of sleep.</li>
+    <li>14:10 eating window: eat only within 10 hours, e.g. 9 am – 7 pm.</li>
+    <li>High-intensity exercise at least 4 times a week, but walking only on days 1–3 and fast days.</li>
+    <li>No added sugar, processed food, processed meat, alcohol or most dairy.</li></ol>
+   <span class="muted" style="font-size:13px">Allowed all along: non-starchy vegetables, avocado, plain yogurt, soft tofu, fish and seafood, seaweed, eggs, chicken, olive or avocado oil, garlic, vinegar, low-sodium soy sauce, green and herbal tea, turmeric, chili, black pepper.</span></div>`;
+  const shake=`<div class="tip"><b>Shake:</b> about 150–170 kcal and 20 g protein each. Use any whey or plant protein, or a Korean diet shake, mixed with water or unsweetened soy milk. Check the label for added sugar.</div>`;
   if(!S.soStart)return `<div class="card" style="display:flex;flex-direction:column;gap:12px"><h3>Your Switch-On tracker</h3>
     <p class="muted" style="margin:0;font-size:14px">Start today and the app shows what to drink, eat and train each day for 28 days, and lets you tick off your shakes.</p>
-    <div class="row"><button class="btn" id="soStart">Start my Switch-On today</button></div>${weeks}${shake}</div>`;
+    <div class="row"><button class="btn" id="soStart">Start my Switch-On today</button></div>${weeks}${shake}</div>${rules}`;
   const d=Math.floor((new Date(iso(new Date()))-new Date(S.soStart))/864e5)+1;const p=soPlan(d);
   const done=(S.soLog||{})[iso(new Date())]||0;
   const circles=p.shakes?`<div class="row" id="soShakes" aria-label="Shakes drunk today">${Array.from({length:p.shakes},(_,k)=>`<button class="btn small ${k<done?"mint":"ghost"}" data-n="${k+1}" aria-pressed="${k<done}">🥤 ${k+1}</button>`).join("")}<span class="muted" style="font-size:13px">${done}/${p.shakes} shakes today</span></div>`:"";
@@ -796,14 +806,15 @@ function soSection(){
    <div class="row" style="justify-content:space-between"><div><span class="eyebrow">${d>28?"Program complete":`Day ${d} of 28 · week ${p.wk}`}</span><h3 style="font-size:20px">${esc(p.title)}</h3></div><button class="btn small ghost" id="soRestart">Restart</button></div>
    <div class="bar"><i style="width:${Math.min(100,Math.round(d/28*100))}%"></i></div>
    ${circles}
+   ${p.probiotic?`<div class="tip"><b>Probiotic:</b> take it on an empty stomach (Noom doesn't name a product or dose; follow the label).</div>`:""}
+   <div style="overflow-x:auto"><table><tbody>${p.slots.map(s=>`<tr><th style="width:90px">${s[0]}</th><td>${esc(s[1])}</td></tr>`).join("")}</tbody></table></div>
    <div class="meals">
-    <div class="meal"><span class="when">Eat</span><span style="font-size:14px">${esc(p.meal)}</span></div>
-    <div class="meal"><span class="when">Carbs</span><span style="font-size:14px">${esc(p.carbs)}</span></div>
+    <div class="meal"><span class="when">Food rules</span><span style="font-size:14px">${esc(p.eat)}</span></div>
     <div class="meal"><span class="when">Train</span><span style="font-size:14px">${esc(p.train)}</span></div>
    </div>
    ${p.note?`<span class="muted" style="font-size:13px">${esc(p.note)}</span>`:""}
-   <details><summary style="cursor:pointer;font-weight:600">See all 4 weeks</summary>${weeks}</details>${shake}</div>
-  <div class="warn"><b>Before you start.</b> Shake-only days are only about 600–700 kcal, so keep them to light exercise and never put a 24-hour fast on a heavy gym day. Drink 2 L of water and have a salty soup or a pinch of salt if you feel faint. Don't do this plan if you're pregnant or breastfeeding, diabetic or on medication, under 18, or have a history of eating disorders. Stop and eat normally if you get dizzy, your period stops, or you lose more than about 1 kg a week after week 1. The Switch-On diet hasn't been tested in clinical trials.</div>`;
+   <details><summary style="cursor:pointer;font-weight:600">See all 4 weeks</summary>${weeks}</details>${shake}</div>${rules}
+  <div class="warn"><b>What Noom says to watch for.</b> Days 1–3 are about 600–700 kcal, which Noom's dietitian says is below what's safe for most adults without medical supervision: expect tiredness, headaches or dizziness, and keep those days to walking only. 24-hour fasts are tougher than most studied fasting plans, so never put one on a gym day. Talk to a doctor or dietitian first if you have a health condition, take medication, have diabetes or low blood sugar, or have a history of disordered eating. Stop and eat normally if you feel faint or your period stops. The 4-week plan itself hasn't been tested in clinical trials, and Noom says most of the loss comes from eating less and cutting processed food.</div>`;
 }
 
 /* ---------- exercise sheet ---------- */
