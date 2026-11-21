@@ -10,10 +10,13 @@ body{margin:0;font:14px system-ui,sans-serif;-webkit-tap-highlight-color:transpa
 img{max-width:100%}
 [hidden]{display:none!important}
 </style>
+<style>
+@font-face{font-family:"Bricolage Grotesque";src:url(fonts/bricolage.woff2) format("woff2");font-weight:200 800;font-display:block}
+@font-face{font-family:"Inter";src:url(fonts/inter.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"JetBrains Mono";src:url(fonts/jetbrainsmono.woff2) format("woff2");font-weight:100 800;font-display:block}
+</style>
 <title>Petite Power Workouts</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 /* Layout: app shell — figure hero + tab bar; one column on phones, two-up cards on wide screens; full-screen workout player overlay */
 :root{
@@ -21,6 +24,7 @@ img{max-width:100%}
   --accent:#C2255C; --accent-soft:#F7DCE6; --accent-2:#23805F; --accent-2-soft:#D8EFE5; --warn:#B87503;
   --skin:#E2A584; --skin-far:#C4876A; --hair:#3A2420; --kit:#2B3833; --kit-far:#1B2521; --top:#C2255C; --band:#F2B8CB;
   --shoe:#FFFFFF; --sole:#C2255C; --lip:#C9566A; --eye:#2A1A17; --blush:#F27A98;
+  --outline:#2E1C1A; --hair-hi:#8A5A48; --iris:#7A3E8C; --iris-2:#3B1F4A;
   --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-body:"Inter", "Segoe UI", system-ui, sans-serif;
   --f-mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
@@ -38,7 +42,7 @@ img{max-width:100%}
   --shoe:#F4F4F2; --sole:#F0628F; --lip:#B85A5E; --eye:#2A1A17; color-scheme:dark }
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;margin:0}
-.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 56px}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px calc(96px + env(safe-area-inset-bottom,0px))}
 h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.1}
 h1{font-size:clamp(30px,6vw,52px);font-weight:800;letter-spacing:-.02em}
 h2{font-size:24px;font-weight:700}
@@ -54,6 +58,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .hero-copy{display:flex;flex-direction:column;gap:14px;min-width:0;padding-block:8px}
 .hero-copy p{margin:0;max-width:52ch;color:var(--muted)}
 .hero-copy h1 em{font-style:normal;color:var(--accent)}
+.hero-copy h1{font-size:clamp(26px,5vw,42px)}
 .stage{background:var(--surface);border:1px solid var(--line);border-radius:22px;position:relative;overflow:hidden;min-height:260px}
 .stage canvas{width:100%;height:100%;display:block;position:absolute;inset:0}
 .stage-tag{position:absolute;left:14px;bottom:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600}
@@ -72,9 +77,33 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 
 /* tabs */
-.tabs{display:flex;gap:4px;margin-block:26px 18px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
-.tabs button{border:0;background:none;padding:10px 14px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
-.tabs button[aria-selected="true"]{color:var(--ink);border-color:var(--accent)}
+/* app shell: sticky app bar + bottom navigation */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--surface)}
+.appbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.appbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:-.01em}
+.brand svg{width:26px;height:26px;fill:var(--accent)}
+.appbar-day{font-size:12.5px;font-weight:600;color:var(--muted);text-align:right}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(6,1fr);background:var(--surface);border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
+.tabs button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;font-size:11px;font-weight:600;color:var(--muted);border-radius:12px;min-width:0}
+.tabs svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabs button[aria-selected="true"]{color:var(--accent)}
+.tabs button[aria-selected="true"] svg{background:var(--accent-soft);border-radius:999px;padding:1px 10px;width:44px;box-sizing:content-box}
+@media (min-width:900px){.tabs{left:50%;right:auto;transform:translateX(-50%);width:620px;bottom:14px;border:1px solid var(--line);border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,.12)}}
+section[role="tabpanel"]{margin-top:8px}
+/* anime mascot */
+.greet{display:flex;align-items:flex-end;gap:10px}
+.mascot{width:108px;height:auto;flex:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.12))}
+.m-line *{stroke:var(--outline);stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round}
+.m-hair{fill:var(--hair)}.m-skin{fill:var(--skin)}.m-kit{fill:var(--kit)}.m-top{fill:var(--top)}.m-shoe{fill:var(--shoe)}
+.m-arm{fill:none;stroke:var(--skin)!important;stroke-width:6.5!important}.m-arm-o{fill:none;stroke-width:10!important}
+.m-hi{fill:none;stroke:var(--hair-hi);stroke-width:3;stroke-linecap:round}
+.m-pupil{fill:#22121C}.m-shine{fill:#fff}.m-lash{fill:none;stroke:var(--outline);stroke-width:2.8;stroke-linecap:round}
+.m-blush{fill:var(--blush);opacity:.55}.m-mouth{fill:var(--lip);stroke:var(--outline);stroke-width:1.2}
+.bubble{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px 16px 16px 4px;padding:10px 14px;display:flex;flex-direction:column;gap:2px;margin-bottom:28px;min-width:0}
+.bubble b{font-family:var(--f-display);font-size:17px;line-height:1.2}
+@media (prefers-reduced-motion:no-preference){.mascot{animation:bob 2.6s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-4px)}}}
+button,.chip,.tabs,.appbar{-webkit-user-select:none;user-select:none}
 section[role="tabpanel"]{display:flex;flex-direction:column;gap:16px}
 
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
@@ -197,12 +226,47 @@ td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
 </style>
 
+<header class="appbar">
+  <div class="appbar-in">
+    <span class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(-30 12 12)"><rect x="2" y="8" width="4" height="8" rx="1"/><rect x="18" y="8" width="4" height="8" rx="1"/><rect x="0" y="10" width="2" height="4" rx=".6"/><rect x="22" y="10" width="2" height="4" rx=".6"/><rect x="6" y="11" width="12" height="2"/></g></svg>Petite Power</span>
+    <span class="appbar-day" id="appbarDay"></span>
+  </div>
+</header>
 <div class="wrap">
-  <div class="hero">
+  <div class="hero" id="hero">
     <div class="hero-copy">
-      <span class="eyebrow">Gym + mat programme · 149 cm · age 20–25</span>
-      <h1>Strong, lean and <em>full of stamina</em>, built for a petite frame.</h1>
-      <p>A 7-day mix of machines, free weights, cardio, HIIT, Pilates and yoga. It focuses on glutes, thighs, arms and shoulders, a flat belly and better endurance. Every move has a timer, set counter, form cues and a setup tip for a 149 cm body.</p>
+      <div class="greet">
+        <svg class="mascot" viewBox="0 0 120 160" aria-hidden="true">
+          <defs><linearGradient id="mIris" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3B1F4A"/><stop offset="1" stop-color="#C0609A"/></linearGradient></defs>
+          <g class="m-line">
+            <path class="m-hair" d="M82 20 C108 14 118 40 109 62 C104 75 96 82 93 94 C93 78 98 64 92 50 C88 40 84 34 78 28 Z"/>
+            <path class="m-hair" d="M24 54 C19 22 44 9 62 10 C86 11 101 27 96 56 C95 68 91 76 87 82 L33 82 C28 76 25 66 24 54 Z"/>
+            <path class="m-kit" d="M47 112 L45 146 L56 146 L60 120 L64 146 L75 146 L73 112 Z"/>
+            <rect class="m-shoe" x="41" y="145" width="17" height="7" rx="3.5"/>
+            <rect class="m-shoe" x="62" y="145" width="17" height="7" rx="3.5"/>
+            <path class="m-arm-o" d="M45 88 C37 96 35 104 37 112"/><path class="m-arm" d="M45 88 C37 96 35 104 37 112"/>
+            <path class="m-arm-o" d="M75 88 C86 84 91 74 89 64"/><path class="m-arm" d="M75 88 C86 84 91 74 89 64"/>
+            <circle class="m-skin" cx="89" cy="61" r="5.5"/>
+            <rect class="m-skin" x="55" y="72" width="10" height="12"/>
+            <path class="m-top" d="M43 85 Q60 78 77 85 L75 101 Q60 104 45 101 Z"/>
+            <path class="m-skin" d="M45 101 Q60 104 75 101 L74 108 Q60 111 46 108 Z"/>
+            <path class="m-kit" d="M46 108 Q60 111 74 108 L73 114 Q60 116 47 114 Z"/>
+            <path class="m-skin" d="M30 50 C30 30 44 21 60 21 C76 21 90 30 90 50 C90 67 78 80 60 80 C42 80 30 67 30 50 Z"/>
+            <path class="m-hair" d="M27 52 C24 27 41 12 60 12 C80 12 97 27 93 53 L88 40 L83 50 L78 35 L71 47 L66 31 L59 46 L52 31 L47 46 L41 36 L35 50 Z"/>
+            <circle class="m-top" cx="83" cy="20" r="4.5"/>
+          </g>
+          <path class="m-hi" d="M40 24 Q58 15 78 22"/>
+          <ellipse cx="46" cy="59" rx="7" ry="9.5" fill="url(#mIris)"/><ellipse cx="74" cy="59" rx="7" ry="9.5" fill="url(#mIris)"/>
+          <ellipse class="m-pupil" cx="46" cy="61" rx="3" ry="4.2"/><ellipse class="m-pupil" cx="74" cy="61" rx="3" ry="4.2"/>
+          <circle class="m-shine" cx="43.5" cy="55" r="2.8"/><circle class="m-shine" cx="71.5" cy="55" r="2.8"/>
+          <circle class="m-shine" cx="48.5" cy="63.5" r="1.3"/><circle class="m-shine" cx="76.5" cy="63.5" r="1.3"/>
+          <path class="m-lash" d="M38 52 Q46 46 54.5 51"/><path class="m-lash" d="M65.5 51 Q74 46 82 52"/>
+          <ellipse class="m-blush" cx="39" cy="69" rx="5" ry="2.6"/><ellipse class="m-blush" cx="81" cy="69" rx="5" ry="2.6"/>
+          <path class="m-mouth" d="M55.5 70 Q60 75.5 64.5 70 Z"/>
+        </svg>
+        <div class="bubble"><span class="eyebrow" id="greetEyebrow">Today</span><b id="greetLine">Let's get strong today!</b></div>
+      </div>
+      <h1>Strong, lean and <em>full of stamina</em></h1>
       <div class="chips" aria-label="Your profile">
         <span class="chip"><b>149 cm</b> height</span>
         <span class="chip">Healthy range <b>41–55 kg</b></span>
@@ -226,18 +290,17 @@ td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
     </div>
     <div class="stage" aria-label="Animated trainer demonstrating exercises">
       <canvas id="heroCanvas"></canvas>
-      <div class="ruler" aria-hidden="true"><span>150</span><span>100</span><span>50</span><span>0 cm</span></div>
       <span class="stage-tag" id="heroTag">Goblet squat</span>
     </div>
   </div>
 
   <nav class="tabs" role="tablist" aria-label="Sections">
-    <button role="tab" id="t-today" aria-controls="p-today" data-tab="today">Today</button>
-    <button role="tab" id="t-week" aria-controls="p-week" data-tab="week">Weekly plan</button>
-    <button role="tab" id="t-lib" aria-controls="p-lib" data-tab="lib">Exercises</button>
-    <button role="tab" id="t-prog" aria-controls="p-prog" data-tab="prog">Progress</button>
-    <button role="tab" id="t-diet" aria-controls="p-diet" data-tab="diet">Korean diet</button>
-    <button role="tab" id="t-tips" aria-controls="p-tips" data-tab="tips">Fat-loss tips</button>
+    <button role="tab" id="t-today" aria-controls="p-today" data-tab="today"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Today</span></button>
+    <button role="tab" id="t-week" aria-controls="p-week" data-tab="week"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Plan</span></button>
+    <button role="tab" id="t-lib" aria-controls="p-lib" data-tab="lib"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/></svg><span>Moves</span></button>
+    <button role="tab" id="t-diet" aria-controls="p-diet" data-tab="diet"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18a9 9 0 0 1-18 0zM8 8c0-2 2-2 2-4M13 8c0-2 2-2 2-4"/></svg><span>Diet</span></button>
+    <button role="tab" id="t-prog" aria-controls="p-prog" data-tab="prog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Progress</span></button>
+    <button role="tab" id="t-tips" aria-controls="p-tips" data-tab="tips"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg><span>Tips</span></button>
   </nav>
 
   <section role="tabpanel" id="p-today" aria-labelledby="t-today"></section>
@@ -270,7 +333,7 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 
 /* ---------- figure engine ---------- */
 const B={x:.5,y:.48,t:0,hd:0,a1:8,f1:12,a2:-6,f2:6,l1:2,s1:0,l2:-3,s2:-3};
-const LEN={t:.29,ua:.14,fa:.13,th:.21,sh:.21,nk:.095,hr:.06};
+const LEN={t:.29,ua:.14,fa:.13,th:.21,sh:.21,nk:.1,hr:.066};
 const G=.9;
 const sw=(o)=>({a1:o.a2,f1:o.f2,a2:o.a1,f2:o.f1,l1:o.l2,s1:o.s2,l2:o.l1,s2:o.s1});
 const runA={t:10,a1:-45,f1:50,a2:45,f2:115,l1:45,s1:-20,l2:-35,s2:-100};
@@ -356,7 +419,7 @@ function frame(m,ph){
   return J;
 }
 let COL={};
-function readColors(){const cs=getComputedStyle(document.documentElement);["--ink","--muted","--line","--skin","--skin-far","--hair","--kit","--kit-far","--top","--band","--shoe","--sole","--lip","--eye","--blush","--surface","--surface-2","--accent","--accent-2"].forEach(k=>COL[k]=cs.getPropertyValue(k).trim());}
+function readColors(){const cs=getComputedStyle(document.documentElement);["--ink","--muted","--line","--skin","--skin-far","--hair","--kit","--kit-far","--top","--band","--shoe","--sole","--lip","--eye","--blush","--outline","--hair-hi","--iris","--iris-2","--surface","--surface-2","--accent","--accent-2"].forEach(k=>COL[k]=cs.getPropertyValue(k).trim());}
 readColors();
 const mq=matchMedia("(prefers-color-scheme: dark)");mq.addEventListener&&mq.addEventListener("change",()=>setTimeout(readColors,30));
 new MutationObserver(()=>setTimeout(readColors,30)).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
@@ -393,22 +456,27 @@ function drawFigure(c,w,h,m,time){
   const fx=(J.f1.x+J.f2.x+J.hip.x)/3;c.fillStyle=COL["--ink"];c.globalAlpha=.07;c.beginPath();const [shx,shy]=P({x:fx,y:G});c.ellipse(shx,shy,.2*s,.014*s,0,0,7);c.fill();c.globalAlpha=1;
   const V=(a,b,k)=>({x:a.x+(b.x-a.x)*k,y:a.y+(b.y-a.y)*k});
   const add=(a,d,k)=>({x:a.x+d.x*k,y:a.y+d.y*k});
-  const cap=(a,b,ra,rb,col)=>{const [ax,ay]=P(a),[bx,by]=P(b);const dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy)||1e-6,nx=-dy/L,ny=dx/L,RA=ra*s,RB=rb*s;
+  // anime line art: every shape gets an ink outline (drawn first, slightly bigger), then its flat fill
+  const OW=.0042,INK=COL["--outline"];
+  const capRaw=(a,b,ra,rb,col)=>{const [ax,ay]=P(a),[bx,by]=P(b);const dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy)||1e-6,nx=-dy/L,ny=dx/L,RA=ra*s,RB=rb*s;
     c.fillStyle=col;c.beginPath();c.moveTo(ax+nx*RA,ay+ny*RA);c.lineTo(bx+nx*RB,by+ny*RB);c.lineTo(bx-nx*RB,by-ny*RB);c.lineTo(ax-nx*RA,ay-ny*RA);c.closePath();c.fill();
     c.beginPath();c.arc(ax,ay,RA,0,7);c.fill();c.beginPath();c.arc(bx,by,RB,0,7);c.fill();};
+  const parts=(list)=>{list.forEach(q=>capRaw(q[0],q[1],q[2]+OW,q[3]+OW,INK));list.forEach(q=>capRaw(q[0],q[1],q[2],q[3],q[4]));};
+  const cap=(a,b,ra,rb,col)=>parts([[a,b,ra,rb,col]]);
+  const dot=(p,rr,col,line)=>{c.fillStyle=col;c.beginPath();c.arc(...P(p),rr*s,0,7);c.fill();if(line){c.strokeStyle=INK;c.lineWidth=OW*s*1.2;c.stroke();}};
   const smooth=(pts)=>{c.beginPath();const n=pts.length;const m0=V(pts[n-1],pts[0],.5);c.moveTo(...P(m0));for(let i=0;i<n;i++){const p=pts[i],q=pts[(i+1)%n];const mq=V(p,q,.5);const [px,py]=P(p),[mx,my]=P(mq);c.quadraticCurveTo(px,py,mx,my);}c.closePath();};
   const bodyDir=rad(J.ha);
   function leg(hip,k,f,kit,skin){
-    cap(hip,k,.04,.023,kit);                       // thigh with glute/hip volume
-    const calf=V(k,f,.32);cap(k,calf,.022,.026,kit);cap(calf,f,.026,.0125,kit); // shaped calf
+    const calf=V(k,f,.32);
     const d={x:f.x-k.x,y:f.y-k.y};const L=Math.hypot(d.x,d.y)||1;d.x/=L;d.y/=L;
     const fd={x:d.y,y:-d.x};                       // foot points forward of the shin
+    parts([[hip,k,.04,.023,kit],[k,calf,.022,.026,kit],[calf,f,.026,.0125,kit]]); // one smooth outlined leg
     cap(add(add(f,fd,-.008),d,.008),add(add(f,fd,.046),d,.014),.016,.011,COL["--shoe"]);
-    c.globalAlpha=.9;cap(add(add(f,fd,-.01),d,.022),add(add(f,fd,.05),d,.024),.005,.005,COL["--sole"]);c.globalAlpha=1;
+    capRaw(add(add(f,fd,-.01),d,.022),add(add(f,fd,.05),d,.024),.005,.005,COL["--sole"]);
   }
   function arm(sh,e,h,skin){
-    cap(sh,e,.018,.0125,skin);cap(e,h,.0125,.0085,skin);
-    const d={x:h.x-e.x,y:h.y-e.y};const L=Math.hypot(d.x,d.y)||1;cap(h,add(h,{x:d.x/L,y:d.y/L},.02),.01,.008,skin);
+    const d={x:h.x-e.x,y:h.y-e.y};const L=Math.hypot(d.x,d.y)||1;
+    parts([[sh,e,.018,.0125,skin],[e,h,.0125,.0085,skin],[h,add(h,{x:d.x/L,y:d.y/L},.02),.011,.008,skin]]);
   }
   // far side
   arm(J.sh,J.e2,J.h2,COL["--skin-far"]);
@@ -422,48 +490,57 @@ function drawFigure(c,w,h,m,time){
   c.save();smooth(outline);c.clip();
   const band=(f0,f1,col)=>{c.fillStyle=col;c.beginPath();c.moveTo(...P(at(f0,.12)));c.lineTo(...P(at(f1,.12)));c.lineTo(...P(at(f1,-.12)));c.lineTo(...P(at(f0,-.12)));c.closePath();c.fill();};
   band(-.3,.24,COL["--kit"]);band(.21,.24,COL["--band"]);band(.58,1.2,COL["--top"]);
+  // seam lines (clipped to the body): top hem and waistband
+  const seam=(f)=>{c.beginPath();c.moveTo(...P(at(f,.12)));c.lineTo(...P(at(f,-.12)));c.strokeStyle=INK;c.lineWidth=OW*s;c.stroke();};seam(.58);seam(.21);
   c.restore();
+  smooth(outline);c.strokeStyle=INK;c.lineWidth=OW*s*2;c.stroke();
   // neck + head
   const uh={x:Math.sin(bodyDir),y:-Math.cos(bodyDir)},fh={x:Math.cos(bodyDir),y:Math.sin(bodyDir)};
   const Hc=J.head,r=LEN.hr;
   cap(add(J.sh,u,-.01),add(Hc,uh,-.02),.014,.013,COL["--skin"]);
-  // bouncy high ponytail with scrunchie
+  const HAIR=COL["--hair"],Q=(a,fk,uk)=>add(add(a,fh,fk),uh,uk);
+  // anime high ponytail: thick, curved, pointed tip
   const sway=RM.matches?0:Math.sin(time*4.5)*.012;
-  const p0=add(add(Hc,fh,-r*.62),uh,r*.72),p1=add(add(p0,fh,-.05+sway*.5),uh,.008),p2=add(add(p1,fh,-.018+sway),uh,-.08);
-  cap(p0,p1,.021,.019,COL["--hair"]);cap(p1,p2,.019,.005,COL["--hair"]);
-  // skull (hair) + rounder face
-  c.fillStyle=COL["--hair"];c.beginPath();c.arc(...P(add(Hc,fh,-.004)),r*1.04*s,0,7);c.fill();
-  const fc=add(add(Hc,fh,r*.12),uh,-r*.07);
-  c.save();c.fillStyle=COL["--skin"];c.beginPath();c.ellipse(...P(fc),r*.86*s,r*.9*s,bodyDir,0,7);c.fill();
-  c.clip();c.fillStyle=COL["--hair"];
-  c.beginPath();c.arc(...P(add(add(Hc,fh,-r*.38),uh,r*.55)),r*.92*s,0,7);c.fill();
-  c.beginPath();c.arc(...P(add(add(Hc,fh,r*.42),uh,r*.66)),r*.42*s,0,7);c.fill(); // soft see-through bangs
+  const p0=Q(Hc,-r*.6,r*.8),p1=Q(p0,-.055+sway*.5,.012),p2=Q(p1,-.03+sway,-.06),p3=Q(p2,.006+sway*1.3,-.05);
+  parts([[p0,p1,.025,.023,HAIR],[p1,p2,.023,.016,HAIR],[p2,p3,.016,.003,HAIR]]);
+  // skull
+  dot(Q(Hc,-.004,0),r*1.05,HAIR,true);
+  // face
+  const fc=Q(Hc,r*.12,-r*.08);
+  c.fillStyle=COL["--skin"];c.beginPath();c.ellipse(...P(fc),r*.86*s,r*.9*s,bodyDir,0,7);c.fill();c.strokeStyle=INK;c.lineWidth=OW*s*1.4;c.stroke();
+  c.save();c.beginPath();c.ellipse(...P(fc),r*.86*s,r*.9*s,bodyDir,0,7);c.clip();
+  c.fillStyle=HAIR;c.beginPath();c.arc(...P(Q(Hc,-r*.4,r*.56)),r*.92*s,0,7);c.fill();
+  // spiky anime bangs
+  c.strokeStyle=INK;c.lineWidth=OW*s;
+  for(let i=0;i<4;i++){const b0=Q(Hc,r*(-.12+.26*i),r*(.74-.06*i)),b1=Q(Hc,r*(.12+.26*i),r*(.66-.07*i)),tip=Q(Hc,r*(.06+.27*i),r*(.18+.02*i-(i===3?.06:0)));
+    c.fillStyle=HAIR;c.beginPath();c.moveTo(...P(b0));c.quadraticCurveTo(...P(Q(b0,r*.02,-r*.2)),...P(tip));c.quadraticCurveTo(...P(Q(b1,0,-r*.18)),...P(b1));c.closePath();c.fill();c.stroke();}
   c.restore();
-  c.fillStyle=COL["--top"];c.beginPath();c.arc(...P(p0),.013*s,0,7);c.fill();
-  c.fillStyle=COL["--band"];c.beginPath();c.arc(...P(p0),.006*s,0,7);c.fill();
-  // ear
-  c.fillStyle=COL["--skin"];c.beginPath();c.arc(...P(add(add(Hc,fh,-r*.12),uh,-r*.12)),r*.19*s,0,7);c.fill();
-  // blush
-  c.fillStyle=COL["--blush"];c.globalAlpha=.5;c.beginPath();c.arc(...P(add(add(Hc,fh,r*.52),uh,-r*.4)),r*.2*s,0,7);c.fill();c.globalAlpha=1;
-  // tiny nose
-  c.fillStyle=COL["--skin"];c.beginPath();c.moveTo(...P(add(add(Hc,fh,r*.84),uh,-r*.16)));c.lineTo(...P(add(add(Hc,fh,r*1.0),uh,-r*.3)));c.lineTo(...P(add(add(Hc,fh,r*.84),uh,-r*.36)));c.closePath();c.fill();
-  // big sparkly eye + lashes
-  const eye=add(add(Hc,fh,r*.5),uh,-r*.08);
-  c.fillStyle=COL["--eye"];c.beginPath();c.ellipse(...P(eye),.0075*s,.0105*s,bodyDir,0,7);c.fill();
-  c.fillStyle="#FFFFFF";c.beginPath();c.arc(...P(add(add(eye,fh,.0022),uh,.0035)),.0028*s,0,7);c.fill();
-  c.strokeStyle=COL["--eye"];c.lineWidth=.0035*s;c.lineCap="round";
-  c.beginPath();c.moveTo(...P(add(add(eye,fh,.004),uh,.009)));c.lineTo(...P(add(add(eye,fh,.011),uh,.013)));c.stroke();
-  c.beginPath();c.moveTo(...P(add(add(eye,fh,.006),uh,.006)));c.lineTo(...P(add(add(eye,fh,.012),uh,.007)));c.stroke();
-  // soft brow
-  c.strokeStyle=COL["--hair"];c.lineWidth=.0035*s;c.beginPath();c.moveTo(...P(add(add(Hc,fh,r*.36),uh,r*.22)));c.quadraticCurveTo(...P(add(add(Hc,fh,r*.52),uh,r*.3)),...P(add(add(Hc,fh,r*.68),uh,r*.24)));c.stroke();
-  // smile
-  c.strokeStyle=COL["--lip"];c.lineWidth=.004*s;c.beginPath();c.moveTo(...P(add(add(Hc,fh,r*.62),uh,-r*.52)));c.quadraticCurveTo(...P(add(add(Hc,fh,r*.74),uh,-r*.64)),...P(add(add(Hc,fh,r*.86),uh,-r*.5)));c.stroke();
+  // hair shine
+  const mid=Math.atan2(uh.y-fh.y*.6,uh.x-fh.x*.6);c.strokeStyle=COL["--hair-hi"];c.lineWidth=.007*s;c.lineCap="round";c.beginPath();c.arc(...P(Q(Hc,-.006,0)),r*.8*s,mid-.42,mid+.42);c.stroke();
+  // scrunchie
+  dot(p0,.015,COL["--top"],true);dot(p0,.006,COL["--band"]);
+  // anime blush hatching
+  const bl=Q(Hc,r*.5,-r*.44);c.fillStyle=COL["--blush"];c.globalAlpha=.45;c.beginPath();c.ellipse(...P(bl),r*.24*s,r*.11*s,bodyDir,0,7);c.fill();c.globalAlpha=.8;
+  c.strokeStyle=COL["--blush"];c.lineWidth=.0025*s;for(let i=-1;i<=1;i++){const h0=Q(bl,r*.12*i+r*.05,r*.07),h1=Q(bl,r*.12*i-r*.03,-r*.07);c.beginPath();c.moveTo(...P(h0));c.lineTo(...P(h1));c.stroke();}c.globalAlpha=1;
+  // nose: small ink tick
+  c.strokeStyle=INK;c.lineWidth=.0028*s;c.beginPath();c.moveTo(...P(Q(Hc,r*.9,-r*.2)));c.lineTo(...P(Q(Hc,r*.97,-r*.3)));c.stroke();
+  // big glossy anime eye
+  const eye=Q(Hc,r*.5,-r*.06);
+  const gp0=P(Q(eye,0,.016)),gp1=P(Q(eye,0,-.016));const gr=c.createLinearGradient(gp0[0],gp0[1],gp1[0],gp1[1]);gr.addColorStop(0,COL["--iris-2"]);gr.addColorStop(1,COL["--iris"]);
+  c.fillStyle=gr;c.beginPath();c.ellipse(...P(eye),.0095*s,.0165*s,bodyDir,0,7);c.fill();
+  c.fillStyle="#1C0F18";c.beginPath();c.ellipse(...P(Q(eye,0,.003)),.0045*s,.008*s,bodyDir,0,7);c.fill();
+  c.fillStyle="#FFFFFF";c.beginPath();c.arc(...P(Q(eye,-.003,.007)),.0048*s,0,7);c.fill();c.beginPath();c.arc(...P(Q(eye,.004,-.008)),.0022*s,0,7);c.fill();
+  // thick upper lash line with a flick
+  c.strokeStyle=INK;c.lineWidth=.0062*s;c.lineCap="round";c.beginPath();c.moveTo(...P(Q(eye,-.011,.012)));c.quadraticCurveTo(...P(Q(eye,0,.022)),...P(Q(eye,.012,.014)));c.lineTo(...P(Q(eye,.019,.019)));c.stroke();
+  c.lineWidth=.0025*s;c.beginPath();c.moveTo(...P(Q(eye,-.006,-.016)));c.quadraticCurveTo(...P(Q(eye,.002,-.019)),...P(Q(eye,.008,-.015)));c.stroke();
+  // brow
+  c.strokeStyle=HAIR;c.lineWidth=.0034*s;c.beginPath();c.moveTo(...P(Q(Hc,r*.34,r*.42)));c.quadraticCurveTo(...P(Q(Hc,r*.52,r*.5)),...P(Q(Hc,r*.7,r*.42)));c.stroke();
+  // happy open mouth
+  const mo=Q(Hc,r*.74,-r*.56);c.fillStyle=COL["--lip"];c.beginPath();c.moveTo(...P(Q(mo,-r*.1,r*.03)));c.quadraticCurveTo(...P(Q(mo,0,-r*.14)),...P(Q(mo,r*.12,r*.04)));c.closePath();c.fill();c.strokeStyle=INK;c.lineWidth=.0022*s;c.stroke();
   // near side
   leg(J.hip,J.k1,J.f1,COL["--kit"],COL["--skin"]);
-  c.fillStyle=COL["--band"];c.globalAlpha=.35;c.beginPath();const [kx,ky]=P(J.k1);c.arc(kx,ky,.006*s,0,7);c.fill();c.globalAlpha=1;
   arm(J.sh,J.e1,J.h1,COL["--skin"]);
   // shoulder cap of the top
-  c.fillStyle=COL["--top"];c.beginPath();c.arc(...P(add(J.sh,u,-.012)),.016*s,0,7);c.fill();
 }
 /* canvas registry & loop */
 const live=new Set();
@@ -909,7 +986,7 @@ function closePlayer(){clearInterval(tick);P=null;$("#player").hidden=true;detac
 
 /* ---------- tabs ---------- */
 function setTab(t){S.tab=t;save();document.querySelectorAll('[role="tab"]').forEach(b=>{const on=b.dataset.tab===t;b.setAttribute("aria-selected",String(on));b.tabIndex=on?0:-1;});
-  document.querySelectorAll('[role="tabpanel"]').forEach(p=>p.hidden=p.id!=="p-"+t);if(t==="prog")requestAnimationFrame(()=>renderProg());}
+  document.querySelectorAll('[role="tabpanel"]').forEach(p=>p.hidden=p.id!=="p-"+t);$("#hero").hidden=t!=="today";window.scrollTo(0,0);if(t==="prog")requestAnimationFrame(()=>renderProg());}
 document.querySelectorAll('[role="tab"]').forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
 window.addEventListener("resize",()=>{if(S.tab==="prog"){const isEx=!S.weights.length;drawSpark(isEx?EX_W:S.weights.slice(-20),isEx);}});
 
@@ -919,7 +996,11 @@ const hc=$("#heroCanvas");attach(hc,"squat");let si=0;
 if(!RM.matches)setInterval(()=>{si=(si+1)%SHOW.length;hc._m=M[SHOW[si][0]];$("#heroTag").textContent=SHOW[si][1];},5200);
 $("#heroStart").addEventListener("click",()=>startPlan(todayIdx()));
 
-function renderAll(){const p=PLAN[todayIdx()];$("#heroToday").textContent=DAYNAMES[todayIdx()]+": "+p.title+" · "+planMins(p,S.level)+" min";renderToday();renderWeek();renderLib();renderDiet();renderTips();renderProg();}
+function renderAll(){const p=PLAN[todayIdx()];$("#heroToday").textContent=DAYNAMES[todayIdx()]+": "+p.title+" · "+planMins(p,S.level)+" min";
+  const so=S.soStart?Math.floor((new Date(iso(new Date()))-new Date(S.soStart))/864e5)+1:0;
+  $("#appbarDay").textContent=DAYNAMES[todayIdx()]+(so>=1&&so<=28?" · Switch-On day "+so:"");
+  $("#greetEyebrow").textContent=DAYNAMES[todayIdx()]+" · "+planMins(p,S.level)+" min";
+  $("#greetLine").textContent=todayIdx()===6?"Rest day! A gentle stretch and a walk.":"Let's do "+p.title.toLowerCase()+"!";renderToday();renderWeek();renderLib();renderDiet();renderTips();renderProg();}
 renderLevel();renderAll();setTab(S.tab||"today");
 })();
 </script>

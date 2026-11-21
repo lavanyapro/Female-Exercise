@@ -3,6 +3,8 @@ package com.petitepower.app;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.view.View;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.WindowManager;
@@ -22,6 +24,8 @@ public class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         web = new WebView(this);
+        web.setBackgroundColor(Color.TRANSPARENT); // show the splash until the page paints
+        web.setOverScrollMode(View.OVER_SCROLL_NEVER);
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);          // saves progress, level and weights

@@ -25,7 +25,16 @@ img{max-width:100%}
 </style>
 """
 
-out = head + body + "\n</html>\n"
+# Use the fonts bundled in assets/fonts instead of Google Fonts, so the app looks the same offline.
+import re
+body = re.sub(r'<link[^>]+fonts\.(googleapis|gstatic)\.com[^>]*>\s*', "", body)
+local_fonts = """<style>
+@font-face{font-family:"Bricolage Grotesque";src:url(fonts/bricolage.woff2) format("woff2");font-weight:200 800;font-display:block}
+@font-face{font-family:"Inter";src:url(fonts/inter.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"JetBrains Mono";src:url(fonts/jetbrainsmono.woff2) format("woff2");font-weight:100 800;font-display:block}
+</style>
+"""
+out = head + local_fonts + body + "\n</html>\n"
 dest = root / "app" / "src" / "main" / "assets" / "index.html"
 dest.parent.mkdir(parents=True, exist_ok=True)
 dest.write_text(out, encoding="utf-8")
