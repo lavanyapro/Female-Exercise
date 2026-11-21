@@ -440,7 +440,7 @@ function drawProp(c,P,s,m,J){
     L({x:h.x-.06,y:h.y+.035},{x:h.x+.12,y:h.y+.035},.03,pad);
     L({x:back.x-.03,y:h.y+.02},{x:back.x-.03+.3*Math.sin(rad(t0)),y:h.y+.02-.3*Math.cos(rad(t0))},.03,pad);
     L({x:h.x+.03,y:h.y+.05},{x:h.x+.03,y:G},.02,soft);L({x:h.x-.08,y:G},{x:h.x+.16,y:G},.02,soft);
-    if(p==="recline"){L({x:h.x+.36,y:.36},{x:h.x+.5,y:.5},.03,pad);}}
+    if(p==="recline"){L({x:h.x+.27,y:.41},{x:h.x+.38,y:.52},.03,pad);}}
   if(p==="floorseat"){L({x:J.hip.x-.06,y:J.hip.y+.03},{x:J.hip.x+.06,y:J.hip.y+.03},.03,pad);L({x:.82,y:.6},{x:.82,y:G},.03,pad);}
   if(p==="chair"){const h=J.hip;L({x:h.x-.05,y:h.y+.02},{x:h.x-.05,y:.12},.03,pad);L({x:J.e1.x-.06,y:J.e1.y+.02},{x:J.e1.x+.1,y:J.e1.y+.02},.03,pad);L({x:h.x-.05,y:.12},{x:h.x-.05,y:G},.02,soft);}
   if(p==="bench"){L({x:.22,y:.665},{x:.76,y:.665},.035,pad);L({x:.3,y:.68},{x:.3,y:G},.02,soft);L({x:.66,y:.68},{x:.66,y:G},.02,soft);}
