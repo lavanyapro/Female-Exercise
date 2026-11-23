@@ -919,29 +919,81 @@ function renderDiet(){
 /* Switch-On 4-week program. Follows the Ro and Everyday Health write-ups (pasted by the user); details vary between sources.
    No beef or pork (user's choice); optional vegan mode. 14:10 window = food between 8 am and 6 pm. */
 const SO_FAST={11:1,16:1,20:1,23:1,25:1,27:1};
+// Specific meals with amounts. ½ bowl rice = about 100 g cooked (≈110 kcal). Rotates by day so each day differs.
+const SO_MEALS={
+ v:{
+  shake:"1 scoop (≈30 g) pea or soy protein + 250 ml unsweetened soy milk (≈180 kcal, ≈28 g protein)",
+  hungry:"Only if very hungry: 100 g plain unsweetened soy yogurt, 100 g silken tofu, or a bowl of cucumber, lettuce and cabbage",
+  lunch:[
+   "Dubu-jorim lunch: 150 g firm tofu braised with 1 tsp low-sodium soy sauce and garlic + 100 g cooked brown rice (½ bowl) + 1 cup spinach namul + 1 small pack gim",
+   "Tempeh bulgogi bowl: 100 g tempeh in light bulgogi sauce + 100 g cooked mixed-grain rice + 1 cup sautéed mushrooms + 5 lettuce leaves to wrap",
+   "Tofu bibimbap: 150 g pan-seared firm tofu + 100 g cooked brown rice + 1½ cups bean sprouts, spinach, carrot and zucchini namul + 1 tsp gochujang",
+   "Edamame rice bowl: 1 cup (150 g) shelled edamame + 100 g cooked brown rice + cucumber + ½ cup seaweed salad (miyeok-muchim) + 1 tsp sesame seeds",
+   "Sundubu lunch: 300 g soft tofu stew in kelp-mushroom broth with zucchini and onion + 100 g cooked mixed-grain rice"],
+  lunch2:[
+   "Lentil & quinoa bowl: 1 cup cooked lentils + ½ cup cooked quinoa (instead of rice) + spinach + mushrooms + 2 tbsp vegan kimchi",
+   "Chickpea & tofu doenjang stew: ½ cup chickpeas + 100 g tofu in vegetable-broth doenjang-jjigae + 100 g cooked brown rice"],
+  dinner:[
+   "Tofu seaweed soup: 200 g firm tofu in miyeok-guk made with kelp broth + cucumber muchim",
+   "Edamame & tofu salad: 1 cup edamame + 100 g firm tofu + shredded cabbage and cucumber + 1 tsp sesame oil and rice vinegar",
+   "Vegan sundubu-jjigae: 300 g soft tofu with mushrooms and zucchini in kelp broth (no rice)",
+   "Tempeh & broccoli stir-fry: 100 g tempeh + 2 cups broccoli and mushrooms with garlic and 1 tsp low-sodium soy sauce",
+   "Bean-sprout soup with tofu: kongnamul-guk with 200 g firm tofu + 1 cup spinach namul"],
+  dinner2:["Tofu scramble: 200 g crumbled firm tofu with spinach, mushrooms and 2 tbsp vegan kimchi"],
+  carb:"100 g roasted sweet potato (≈90 kcal) or ⅓ bowl rice",
+  hiit:"1 small banana or 100 g roasted sweet potato with your afternoon shake on HIIT days"
+ },
+ s:{
+  shake:"1 scoop (≈30 g) whey or plant protein + 250 ml water or unsweetened soy milk (≈120–180 kcal, ≈25 g protein)",
+  hungry:"Only if very hungry: 100 g plain yogurt, 100 g silken tofu, or a bowl of cucumber, lettuce and cabbage",
+  lunch:[
+   "Grilled mackerel lunch: 100 g mackerel + 100 g cooked mixed-grain rice (½ bowl) + 1 cup spinach namul + 1 small pack gim",
+   "Chicken bowl: 120 g grilled chicken breast + 100 g cooked brown rice + 1 cup sautéed mushrooms + ½ cup seaweed salad",
+   "Egg & tofu set: gyeran-jjim (2 eggs) + 100 g pan-seared tofu + 100 g cooked mixed-grain rice + cucumber muchim",
+   "Salmon lunch: 100 g baked salmon + 100 g cooked brown rice + 1 cup bean-sprout namul",
+   "Tofu bibimbap with egg: 100 g tofu + 1 fried egg + 100 g cooked brown rice + 1½ cups namul + 1 tsp gochujang"],
+  lunch2:[
+   "Chicken & quinoa bowl: 120 g chicken breast + ½ cup cooked quinoa + spinach + 2 tbsp kimchi",
+   "Tuna & bean salad: 1 can tuna in water + ½ cup chickpeas + lettuce, cucumber, tomato + 100 g cooked brown rice"],
+  dinner:[
+   "Steamed white fish: 150 g cod or pollock + 2 cups broccoli + cucumber muchim",
+   "Chicken salad: 150 g grilled chicken breast + big salad with 1 tsp sesame oil dressing",
+   "Soft tofu stew: 300 g soft tofu + 1 egg + mushrooms and zucchini (no rice)",
+   "Egg & tofu plate: 2-egg vegetable omelette + 100 g tofu + 1 cup spinach namul",
+   "Grilled salmon: 120 g salmon + 2 cups steamed vegetables"],
+  dinner2:["Chicken & mushroom stir-fry: 150 g chicken breast + mushrooms, peppers, cabbage (no rice)"],
+  carb:"100 g roasted sweet potato (≈90 kcal) or ⅓ bowl rice",
+  hiit:"1 small banana or 100 g roasted sweet potato with your afternoon shake on HIIT days"
+ },
+ fruit:["1 cup (150 g) mixed berries","1 small apple","½ Korean pear (배)","1 orange","2 kiwis","1 cup strawberries","1 small banana"]
+};
+function soMeal(list,list2,d,wk){const all=wk>=2?list.concat(list2):list;return all[(d-1)%all.length];}
 function soPlan(d,vg){
-  const F=foods(vg),wk=d<=7?1:d<=14?2:d<=21?3:4,pre=!!SO_FAST[d+1]&&d<28;
+  const F=foods(vg),M=SO_MEALS[vg?"v":"s"],wk=d<=7?1:d<=14?2:d<=21?3:4,pre=!!SO_FAST[d+1]&&d<28;
+  const SH=vg?"Vegan shake":"Shake",shk=SH+": "+M.shake;
+  const lunch=soMeal(M.lunch,M.lunch2,d,wk),dinner=soMeal(M.dinner,M.dinner2,d,wk),fruit=SO_MEALS.fruit[(d-1)%SO_MEALS.fruit.length];
+  const dinnerTxt=wk===4?dinner+" + "+M.carb:dinner;
   const sleep=["Night","10:30 pm","😴 Sleep: at least 6 hours (7–8 is better)"],water=["Night","After dinner","💧 Water, green or herbal tea only until breakfast (14-hour overnight fast)"];
   const dinnerNight=(txt)=>pre?["Night","6:00 pm","🍽️ Early dinner by 6 pm: "+txt+". Make it filling: your 24-hour fast starts after this."]:["Night","6:00 pm","🍽️ "+txt+". Last food of the day."];
-  if(d>28)return{wk:5,title:"After the 4 weeks",shakes:0,times:[["Morning","8:00 am","🍳 Protein breakfast or a "+F.shake],["Afternoon","12:30 pm","🍱 "+F.LC],["Afternoon","3:30 pm","🍎 Fruit or a shake"],["Afternoon","4:30 pm","🏋️ Your normal gym plan"],["Night","6:00 pm","🍽️ Protein + vegetables"],sleep],eat:"The plan doesn't describe what to do after week 4. Keep the 14:10 window, the foods-to-avoid list and protein at every meal.",fast:false};
+  if(d>28)return{wk:5,title:"After the 4 weeks",shakes:0,times:[["Morning","8:00 am","🍳 Protein breakfast or a shake"],["Afternoon","12:30 pm","🍱 "+lunch],["Afternoon","3:30 pm","🍎 "+fruit+" or a shake"],["Afternoon","4:30 pm","🏋️ Your normal gym plan"],["Night","6:00 pm","🍽️ "+dinner+" + "+M.carb],sleep],eat:"The plan doesn't describe what to do after week 4. Keep the 14:10 window, the foods-to-avoid list and protein at every meal.",fast:false};
   if(SO_FAST[d])return{wk,title:"24-hour fast day",shakes:1,fastDay:true,times:[
     ["Morning","7:30 am","💧 Water, green or herbal tea"+(wk>=2?", or 1 black coffee":"")],["Morning","8:00 am","⛔ No breakfast shake: you're fasting"],
-    ["Afternoon","12:30 pm","⛔ No lunch: water or tea only"],["Afternoon","3:30 pm","🥤 "+F.shake[0].toUpperCase()+F.shake.slice(1)+": this ends your fast"],["Afternoon","4:30 pm","🚶 Gentle walk or yoga only, no gym"],
-    ["Night","6:00–7:00 pm","🍽️ "+(wk===4?F.LCD:F.CF)+". Make it filling to protect your muscle."],water,sleep],
+    ["Afternoon","12:30 pm","⛔ No lunch: water or tea only"],["Afternoon","3:30 pm","🥤 "+shk+". This ends your fast"],["Afternoon","4:30 pm","🚶 Gentle walk or yoga only, no gym"],
+    ["Night","6:00–7:00 pm","🍽️ "+dinnerTxt+". Make it filling to protect your muscle."],water,sleep],
     eat:wk===2?"Week 2 has 1 fast.":wk===3?"Week 3 has 2 fasts on non-consecutive days.":"Week 4 has 3 fasts on non-consecutive days.",fast:true,note:"Move this fast to your Sunday or yoga day if it lands on a gym day."};
   if(d<=3)return{wk,title:"Reset: shakes only",shakes:4,times:[
-    ["Morning","7:30 am","💊 "+F.probiotic+" on an empty stomach + a big glass of water"],["Morning","8:00 am","🥤 Breakfast: "+F.shake],
-    ["Afternoon","12:30 pm","🥤 Lunch: "+F.shake],["Afternoon","3:30 pm","🥤 Snack: "+F.shake],["Afternoon","Any time","🚶 Walk for at least 1 hour (you can split it up). No gym today."],
-    dinnerNight("Dinner: "+F.shake),water,sleep],eat:F.hungry,fast:false};
+    ["Morning","7:30 am","💊 "+F.probiotic+" on an empty stomach + a big glass of water"],["Morning","8:00 am","🥤 Breakfast. "+shk],
+    ["Afternoon","12:30 pm","🥤 Lunch: "+SH.toLowerCase()+" (same recipe)"],["Afternoon","3:30 pm","🥤 Snack: "+SH.toLowerCase()+" (same recipe)"],["Afternoon","Any time","🚶 Walk for at least 1 hour (you can split it up). No gym today."],
+    dinnerNight("Dinner: "+SH.toLowerCase()+" (same recipe)"),water,sleep],eat:M.hungry+". Green and herbal tea, olive or avocado oil are fine. No caffeine, wheat"+(vg?"":" or dairy")+" this week.",fast:false};
   if(d<=7)return{wk,title:"Shakes + low-carb lunch",shakes:3,times:[
-    ["Morning","7:30 am","💧 A big glass of water"],["Morning","8:00 am","🥤 Breakfast: "+F.shake],
-    ["Afternoon","12:30 pm","🍱 "+F.LC],["Afternoon","3:30 pm","🥤 Afternoon "+F.shake],["Afternoon","4:30 pm","🚶 Walk + light gym: Pilates, yoga, light machines"],
-    dinnerNight("Dinner: "+F.shake),water,sleep],eat:F.add15,fast:false};
-  const add={2:F.add2,3:"New this week: tomatoes and berries. Sweet potato or banana before or after intense exercise.",4:"New this week: 1 serving of fruit a day. Dinner is now low-carb instead of no-carb."}[wk];
+    ["Morning","7:30 am","💧 A big glass of water"],["Morning","8:00 am","🥤 Breakfast. "+shk],
+    ["Afternoon","12:30 pm","🍱 "+lunch],["Afternoon","3:30 pm","🥤 Afternoon "+SH.toLowerCase()+" (same recipe)"],["Afternoon","4:30 pm","🚶 Walk + light gym: Pilates, yoga, light machines"],
+    dinnerNight("Dinner: "+SH.toLowerCase()+" (same recipe)"),water,sleep],eat:F.add15,fast:false};
+  const add={2:F.add2,3:"New this week: tomatoes and berries. "+M.hiit+".",4:"New this week: 1 serving of fruit a day. Dinner now includes "+M.carb+"."}[wk];
   return{wk,title:wk===2?"Week 2: first fast":wk===3?"Week 3: two fasts":"Week 4: three fasts",shakes:2,times:[
-    ["Morning","7:30 am","💧 Water"+(wk>=2?" and 1 black coffee if you like":"")],["Morning","8:00 am","🥤 Breakfast: "+F.shake],
-    ["Afternoon","12:30 pm","🍱 "+F.LC+(wk===4?" + 1 piece of fruit":"")],["Afternoon","3:30 pm","🥤 Afternoon "+F.shake+(wk>=3?" (+ a banana or sweet potato on HIIT days)":"")],["Afternoon","4:30 pm","🏋️ Workout: today's gym plan (high-intensity at least 4 times a week)"],
-    dinnerNight(wk===4?F.LCD:F.CF),water,sleep],eat:add,fast:false};
+    ["Morning","7:30 am","💧 Water"+(wk>=2?" and 1 black coffee if you like":"")],["Morning","8:00 am","🥤 Breakfast. "+shk],
+    ["Afternoon","12:30 pm","🍱 "+lunch+(wk===4?" + "+fruit:"")],["Afternoon","3:30 pm","🥤 Afternoon "+SH.toLowerCase()+" (same recipe)"+(wk>=3?". On HIIT days add 1 small banana or 100 g roasted sweet potato":"")],["Afternoon","4:30 pm","🏋️ Workout: today's gym plan (high-intensity at least 4 times a week)"],
+    dinnerNight(dinnerTxt),water,sleep],eat:add,fast:false};
 }
 function fastGuide(vg){const F=foods(vg);return `<div class="card" style="display:flex;flex-direction:column;gap:10px">
   <h3>How a 24-hour fast works</h3>
