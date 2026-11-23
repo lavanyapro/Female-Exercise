@@ -187,6 +187,19 @@ td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .grocery{columns:2 200px;column-gap:18px;margin:0;padding-left:18px;font-size:14px}
 @media (max-width:820px){.diet-top{grid-template-columns:1fr}.plate{grid-template-columns:repeat(2,1fr)}}
 
+/* Switch-On day timeline */
+.tl-wrap{display:flex;flex-direction:column;gap:10px}
+.tl{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tl-h{padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.tl-morning{background:color-mix(in srgb,var(--warn) 16%,var(--surface))}
+.tl-afternoon{background:var(--accent-2-soft)}
+.tl-night{background:color-mix(in srgb,var(--iris) 18%,var(--surface))}
+.tl-r{display:grid;grid-template-columns:82px 1fr;gap:10px;padding:9px 12px;border-top:1px solid var(--line);font-size:14px;align-items:baseline}
+.tl-t{font-family:var(--f-mono);font-size:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.so-nav{justify-content:space-between}
+.so-nav .btn[disabled]{opacity:.4;cursor:default}
+#dietMode{flex-wrap:wrap}
+
 /* modal + player */
 .overlay{position:fixed;inset:0;z-index:50;background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
 .sheet{background:var(--surface);border:1px solid var(--line);border-radius:22px 22px 0 0;width:100%;max-width:640px;max-height:92%;overflow:auto;padding:18px max(16px,env(safe-area-inset-left,0px)) 22px max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:12px}
@@ -817,72 +830,124 @@ const KSWAPS=[["Fried chicken (치킨)","Air-fried or grilled chicken breast (�
 const KGROCERY=["Multigrain rice mix (잡곡)","Eggs","Tofu: firm and soft (순두부)","Chicken breast & thighs","Mackerel, salmon, pollock, tuna (in water)","Tempeh, soy chunks, edamame (plant protein)","Kimchi","Doenjang & gochujang","Spinach, bean sprouts, zucchini","Lettuce & perilla leaves","Mushrooms, cabbage, cucumber","Dried seaweed (미역, 김)","Sweet potatoes (고구마)","Konjac noodles & jelly","Greek yogurt, soy milk","Misugaru powder","Apples, pears, berries","Barley tea (보리차)"];
 let dietDay=null;
 function kcalTarget(){const kg=kgVal();const bmr=10*kg+6.25*149-5*22-161;return Math.max(1300,Math.round((bmr*1.55-350)/50)*50);}
+/* ---------- food style: chicken·egg·fish or vegan ---------- */
+const VMENU=[
+ ["Dubu-jorim set","두부조림","Braised firm tofu (200 g) in light soy-garlic sauce with spinach namul. Add ½ bowl rice at lunch.",430,26,"Lunch or dinner"],
+ ["Vegan sundubu-jjigae","채식 순두부찌개","Soft tofu stew made with kelp and mushroom broth, zucchini and onion. No egg, no seafood.",300,20,"Lunch or dinner"],
+ ["Tofu doenjang-jjigae","두부 된장찌개","Soybean-paste stew with vegetable broth (not anchovy), tofu, zucchini and mushrooms.",320,20,"Lunch or dinner"],
+ ["Tempeh bulgogi ssam","템페 불고기 쌈","120 g tempeh in light bulgogi sauce, wrapped in lettuce and perilla leaves.",420,26,"Lunch or dinner"],
+ ["Vegan bibimbap","채식 비빔밥","Lots of namul vegetables, pan-seared tofu instead of egg, 1 tsp gochujang, ½ bowl rice.",480,22,"Lunch only"],
+ ["Bean-sprout soup with tofu","콩나물국 · 두부","Light kongnamul-guk with tofu cubes and green onion.",250,18,"Dinner"],
+ ["Edamame & tofu salad","에다마메 두부 샐러드","Edamame, cubed tofu, cucumber and cabbage with sesame dressing.",350,28,"Lunch or dinner"],
+ ["Tofu seaweed soup","두부 미역국","Miyeok-guk made with kelp broth and tofu.",260,18,"Dinner"],
+ ["Tofu scramble with vegan kimchi","두부 스크램블","Crumbled firm tofu with spinach, mushrooms and a little vegan kimchi (from week 2).",330,24,"Lunch or dinner"],
+ ["Lentil & mushroom stir-fry","렌틸콩 버섯볶음","Lentils with mushrooms, garlic and spinach namul (from week 2).",380,24,"Lunch or dinner"]
+];
+const VSWAPS=[["Kimchi with fish sauce or shrimp","Vegan kimchi (비건 김치)"],["Anchovy broth (멸치육수)","Kelp and mushroom broth"],["Whey protein (milk)","Pea or soy protein"],["Egg in bibimbap or sundubu","Extra tofu"],["Dairy yogurt","Unsweetened soy yogurt"],["Fish oil","Algae omega-3"],["Seitan (wheat gluten)","Tofu, tempeh, edamame (no flour on this plan)"]];
+const VGROCERY=["Pea or soy protein powder","Vegan probiotic","Firm tofu (calcium-set) and soft tofu (순두부)","Tempeh, edamame","Lentils, chickpeas, black beans (week 2+)","Mixed-grain or brown rice, quinoa","Mushrooms, spinach, bean sprouts, zucchini","Cabbage, cucumber, lettuce & perilla leaves","Seaweed: miyeok, gim, kelp for broth","Vegan kimchi (비건 김치)","Doenjang (check: no anchovy)","Low-sodium soy sauce","Unsweetened fortified soy milk & soy yogurt","Nuts, berries, tomatoes","Sweet potatoes (고구마)","Green and barley tea"];
+function foods(vg){return vg?{
+  chips:'<span class="chip">🌱 Vegan</span><span class="chip">🫘 Tofu · tempeh · edamame</span><span class="chip">🥬 Vegetables</span><span class="chip">No meat, fish, eggs or dairy</span>',
+  shake:"vegan protein shake (pea or soy)",probiotic:"Vegan probiotic",
+  hungry:"If 4 shakes aren't enough: small amounts of plain unsweetened soy yogurt, tofu or leafy vegetables. Green and herbal tea, olive or avocado oil are fine. No caffeine or wheat this week.",
+  LC:"Low-carb lunch: ½ bowl mixed-grain or brown rice + tofu, tempeh or edamame + mushrooms, seaweed, vegetables",
+  CF:"No-carb dinner: tofu, tempeh or edamame (lentils or beans from week 2) + lots of vegetables, no rice",
+  LCD:"Low-carb dinner: tofu, tempeh, edamame or lentils + vegetables, with only a little grain or sweet potato",
+  add15:"Added from day 4: brown or mixed-grain rice, mushrooms, seaweed, low-sodium soy sauce, tofu, tempeh, edamame. Still no caffeine or wheat.",
+  add2:"New this week: lentils, chickpeas and beans, quinoa, nuts, vegan kimchi (no fish sauce), unsweetened soy milk, black coffee.",
+  protein:"tofu, tempeh, edamame, beans",preDinner:"tofu, tempeh or edamame + vegetables"
+ }:{
+  chips:'<span class="chip">🐔 Chicken</span><span class="chip">🥚 Eggs</span><span class="chip">🐟 Fish</span><span class="chip">🥬 Vegetables</span><span class="chip">🌱 Plant-based</span><span class="chip">No beef · no pork</span>',
+  shake:"protein shake",probiotic:"Probiotic",
+  hungry:"If 4 shakes aren't enough: small amounts of plain yogurt, leafy vegetables or tofu. Green and herbal tea, olive or avocado oil are fine. No caffeine, wheat or dairy this week.",
+  LC:"Low-carb lunch: ½ bowl mixed-grain or brown rice + fish, tofu, skinless chicken, eggs or tempeh + mushrooms, seaweed, vegetables",
+  CF:"No-carb dinner: grilled or steamed fish, skinless chicken, eggs or tofu + vegetables, no rice",
+  LCD:"Low-carb dinner: fish, chicken, eggs or tofu + vegetables, with only a little grain or sweet potato",
+  add15:"Added from day 4: brown or mixed-grain rice, mushrooms, seaweed, low-sodium soy sauce, eggs, fish, skinless chicken. Still no caffeine, wheat or dairy.",
+  add2:"New this week: beans and legumes, quinoa, nuts, kimchi, unsalted natural cheese, milk or unsweetened soy milk, black coffee.",
+  protein:"tofu, fish, egg, chicken",preDinner:"fish, chicken, eggs or tofu + vegetables"
+ };}
+let soView=null; // which Switch-On day is being viewed (null = today)
 function renderDiet(){
   if(dietDay===null)dietDay=todayIdx();
+  const vg=!!S.vegan,F=foods(vg);
   const day=KMENU[dietDay],tk=day.reduce((a,m)=>a+m[4],0),tp=day.reduce((a,m)=>a+m[5],0),kg=kgVal(),target=kcalTarget();
   const diff=target-tk;
+  const ideas=vg?`
+  <div><h2>Vegan K-food meal ideas</h2><span class="muted" style="font-size:13.5px">Use these for your low-carb lunch (with ½ bowl mixed grains) and, from week 2, your no-carb dinner (no rice). Lentils and kimchi come back in week 2.</span></div>
+  <div class="meals">${VMENU.map(m=>`<div class="card meal"><span class="when">${m[5]}</span><span class="nm">${esc(m[0])}</span><span class="ko">${m[1]}</span><span class="muted" style="font-size:13.5px">${esc(m[2])}</span><span class="nut">~${m[3]} kcal · ${m[4]} g protein</span></div>`).join("")}</div>
+  <div class="card"><h3>Getting enough vegan protein (aim ${Math.round(kg*1.6)} g a day)</h3><div style="overflow-x:auto"><table><tbody>
+   <tr><td>Vegan shake</td><td class="n">20–25 g</td></tr><tr><td>Firm tofu, 150 g</td><td class="n">~20 g</td></tr><tr><td>Tempeh, 100 g</td><td class="n">~19 g</td></tr><tr><td>Edamame, 1 cup</td><td class="n">~17 g</td></tr><tr><td>Cooked lentils, 1 cup (week 2+)</td><td class="n">~18 g</td></tr></tbody></table></div></div>`:`
+  <div class="row" style="justify-content:space-between"><div><h2>K-food meal ideas</h2><span class="muted" style="font-size:13.5px">During Switch-On, use these as ideas for your low-carb lunch (keep it to ½ bowl mixed grains) and, from week 2, your no-carb dinner (no rice). Skip anything with flour, sugar or fried food. After the 4 weeks, follow the full day.</span></div>
+   <div class="fchips" id="dietDays">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map((d,i)=>`<button data-d="${i}" aria-pressed="${i===dietDay}">${d}${i===todayIdx()?" ·":""}</button>`).join("")}</div></div>
+  <div class="meals">${day.map(m=>`<div class="card meal"><span class="when">${m[0]}</span><span class="nm">${esc(m[1])}</span><span class="ko">${m[2]}</span><span class="muted" style="font-size:13.5px">${esc(m[3])}</span><span class="nut">~${m[4]} kcal · ${m[5]} g protein</span></div>`).join("")}</div>
+  <div class="daytotal"><span class="chip">Day total <b class="mono">~${tk} kcal</b></span><span class="chip"><b class="mono">${tp} g</b> protein</span>
+   <span class="muted" style="font-size:13px">${Math.abs(diff)<100?"Right on your target.":diff>0?`About ${diff} kcal under your target: add a boiled egg, soy milk or a little more rice on training days.`:`About ${-diff} kcal over your target: use ⅓ bowl rice at lunch and skip the snack fruit.`}</span></div>`;
   $("#p-diet").innerHTML=`
   <div class="diet-top">
    <div class="card" style="display:flex;flex-direction:column;gap:10px"><span class="eyebrow">Switch-On diet · 스위치온 다이어트</span><h2>4 weeks: protein shakes, one protein meal, then fasting days</h2>
-    <p class="muted" style="margin:0">The Korean Switch-On diet (Dr. Park Yong-woo) "switches on" fat burning: 3 weeks built on protein shakes plus one low-carb protein meal, with 24-hour fasts added from week 2, then week 4 rebuilds normal Korean meals. This tracker follows Everyday Health's description of the plan.</p>
-    <div class="chips"><span class="chip">🐔 Chicken</span><span class="chip">🥚 Eggs</span><span class="chip">🐟 Fish</span><span class="chip">🥬 Vegetables</span><span class="chip">🌱 Plant-based</span><span class="chip">No beef · no pork</span></div></div>
+    <p class="muted" style="margin:0">The Korean Switch-On diet (Dr. Park Yong-woo): 3 weeks built on protein shakes plus a low-carb protein lunch, 24-hour fasts from week 2, and fruit back in week 4. This tracker follows the Ro and Everyday Health write-ups.</p>
+    <div class="seg" id="dietMode" role="group" aria-label="Food style"><button data-v="0" aria-pressed="${!vg}">🐔 Chicken · egg · fish</button><button data-v="1" aria-pressed="${vg}">🌱 Vegan</button></div>
+    <div class="chips">${F.chips}</div></div>
    <div class="card" style="display:flex;flex-direction:column;gap:10px"><h3>Your daily target</h3>
     <div class="stats"><div class="stat"><div class="v mono">${target}</div><div class="l">kcal / day from week 4</div></div><div class="stat"><div class="v mono">${Math.round(kg*1.6)}+</div><div class="l">g protein</div></div><div class="stat"><div class="v mono">2 L</div><div class="l">water / tea</div></div></div>
     <span class="muted" style="font-size:13px">Based on 149 cm, ${kg} kg, age 22 and 6 training days, minus a gentle 350 kcal for fat loss. Log your weight in Progress to update it.</span></div>
   </div>
-  ${soSection()}
+  ${soSection(vg)}
   <div class="card" style="display:flex;flex-direction:column;gap:10px"><h3>Your protein meal plate</h3>
-   <div class="plate"><div><b>½</b>vegetables & namul<span class="ko">나물 · 채소</span></div><div><b>¼</b>protein: tofu, fish, egg, chicken<span class="ko">단백질</span></div><div><b>¼</b>multigrain rice or sweet potato<span class="ko">잡곡밥 · 고구마</span></div><div><b>+1</b>soup or kimchi on the side<span class="ko">국 · 김치</span></div></div></div>
-  <div class="row" style="justify-content:space-between"><div><h2>K-food meal ideas</h2><span class="muted" style="font-size:13.5px">During Switch-On, use these as ideas for your low-carb lunch (keep it to ½ bowl mixed grains) and, from week 2, your carb-free dinner (no rice). Skip anything with flour, sugar or fried food. After the 4 weeks, follow the full day.</span></div>
-   <div class="fchips" id="dietDays">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map((d,i)=>`<button data-d="${i}" aria-pressed="${i===dietDay}">${d}${i===todayIdx()?" ·":""}</button>`).join("")}</div></div>
-  <div class="meals">${day.map(m=>`<div class="card meal"><span class="when">${m[0]}</span><span class="nm">${esc(m[1])}</span><span class="ko">${m[2]}</span><span class="muted" style="font-size:13.5px">${esc(m[3])}</span><span class="nut">~${m[4]} kcal · ${m[5]} g protein</span></div>`).join("")}</div>
-  <div class="daytotal"><span class="chip">Day total <b class="mono">~${tk} kcal</b></span><span class="chip"><b class="mono">${tp} g</b> protein</span>
-   <span class="muted" style="font-size:13px">${Math.abs(diff)<100?"Right on your target.":diff>0?`About ${diff} kcal under your target: add a boiled egg, soy milk or a little more rice on training days.`:`About ${-diff} kcal over your target: use ⅓ bowl rice at lunch and skip the snack fruit.`}</span></div>
+   <div class="plate"><div><b>½</b>vegetables & namul<span class="ko">나물 · 채소</span></div><div><b>¼</b>protein: ${F.protein}<span class="ko">단백질</span></div><div><b>¼</b>multigrain rice or sweet potato<span class="ko">잡곡밥 · 고구마</span></div><div><b>+1</b>soup or ${vg?"vegan ":""}kimchi on the side<span class="ko">국 · 김치</span></div></div></div>
+  ${ideas}
   <div class="prog">
-   <div class="card"><h3>Smart K-food swaps</h3><div style="overflow-x:auto"><table class="swaps"><thead><tr><th>Instead of</th><th>Choose</th></tr></thead><tbody>${KSWAPS.map(s=>`<tr><td>${esc(s[0])}</td><td>${esc(s[1])}</td></tr>`).join("")}</tbody></table></div></div>
+   <div class="card"><h3>${vg?"Vegan swaps":"Smart K-food swaps"}</h3><div style="overflow-x:auto"><table class="swaps"><thead><tr><th>Instead of</th><th>Choose</th></tr></thead><tbody>${(vg?VSWAPS:KSWAPS).map(s=>`<tr><td>${esc(s[0])}</td><td>${esc(s[1])}</td></tr>`).join("")}</tbody></table></div></div>
    <div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>Korean habits that help</h3>
     <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px">
      <li>Start with soup and vegetables, then protein, rice last.</li>
      <li>Use chopsticks and eat slowly, about 20 minutes a meal.</li>
      <li>Take a 10-minute walk after dinner (식후 산책).</li>
      <li>Drink barley tea or corn-silk tea instead of sugary drinks.</li>
-     <li>Stop eating 3 hours before bed and keep a 12-hour overnight break.</li>
-     <li>Kimchi, soy sauce and jjigae are salty: one salty dish per meal, and drink the soup less than you eat its contents.</li>
+     <li>Kimchi, soy sauce and jjigae are salty: one salty dish per meal, and leave most of the soup liquid.</li>
     </ol></div>
   </div>
-  <div class="card"><h3>Shopping list (Korean mart / 마트)</h3><ul class="grocery">${KGROCERY.map(g=>`<li>${esc(g)}</li>`).join("")}</ul></div>
-  <div class="warn"><b>Don't stretch the shake-only days.</b> Staying on 600–800 kcal for weeks, or viral "idol diets" like paper-cup meals, cause muscle loss, hair loss, missed periods and rebound weight gain. Switch-On adds food back after day 3 on purpose. After the 4 weeks, eat around your daily target with this menu. Calorie numbers are estimates.</div>`;
-  $("#dietDays").querySelectorAll("button").forEach(b=>b.onclick=()=>{dietDay=+b.dataset.d;renderDiet();});
-  const st=$("#soStart");st&&(st.onclick=()=>{S.soStart=iso(new Date());S.soLog={};save();renderDiet();});
-  const rs=$("#soRestart");rs&&(rs.onclick=()=>{if(rs.dataset.arm){S.soStart=null;S.soLog={};save();renderDiet();}else{rs.dataset.arm="1";rs.textContent="Tap again to restart";}});
+  <div class="card"><h3>Shopping list (Korean mart / 마트)</h3><ul class="grocery">${(vg?VGROCERY:KGROCERY).map(g=>`<li>${esc(g)}</li>`).join("")}</ul></div>
+  <div class="warn"><b>Don't stretch the shake-only days.</b> Staying on 600–800 kcal for weeks, or viral "idol diets" like paper-cup meals, cause muscle loss, hair loss, missed periods and rebound weight gain. Switch-On adds food back after day 3 on purpose. Calorie numbers are estimates.</div>`;
+  const dd=$("#dietDays");dd&&dd.querySelectorAll("button").forEach(b=>b.onclick=()=>{dietDay=+b.dataset.d;renderDiet();});
+  document.querySelectorAll("#dietMode button").forEach(b=>b.onclick=()=>{S.vegan=b.dataset.v==="1";save();renderDiet();});
+  const st=$("#soStart");st&&(st.onclick=()=>{S.soStart=iso(new Date());S.soLog={};soView=null;save();renderDiet();renderAll();});
+  const rs=$("#soRestart");rs&&(rs.onclick=()=>{if(rs.dataset.arm){S.soStart=null;S.soLog={};soView=null;save();renderDiet();renderAll();}else{rs.dataset.arm="1";rs.textContent="Tap again to restart";}});
   document.querySelectorAll("#soShakes button").forEach(b=>b.onclick=()=>{S.soLog=S.soLog||{};const t=iso(new Date()),n=+b.dataset.n;S.soLog[t]=(S.soLog[t]===n?n-1:n);save();renderDiet();});
+  document.querySelectorAll("[data-sonav]").forEach(b=>b.onclick=()=>{const v=b.dataset.sonav;soView=v==="today"?null:Math.max(1,Math.min(28,+v));renderDiet();const c=$("#soCard");c&&c.scrollIntoView({block:"start"});window.scrollBy(0,-70);});
 }
-/* Switch-On 4-week program (common published schedule; details vary between sources) */
+/* Switch-On 4-week program. Follows the Ro and Everyday Health write-ups (pasted by the user); details vary between sources.
+   No beef or pork (user's choice); optional vegan mode. 14:10 window = food between 8 am and 6 pm. */
 const SO_FAST={11:1,16:1,20:1,23:1,25:1,27:1};
-// Schedule follows the Ro and Everyday Health write-ups of the Korean Switch-On diet (pasted by the user). No beef or pork (user's choice).
-const LC="Low-carb meal: ½ bowl mixed grains or brown rice (잡곡밥) with fish, tofu, skinless chicken, eggs, tempeh, mushrooms or seaweed";
-const CF="No-carb, high-protein dinner: grilled or steamed fish, skinless chicken, eggs or tofu with vegetables (no rice or grains)";
-const LCD="Low-carb dinner: lean protein (fish, chicken, eggs, tofu) + vegetables, with only a little grain or sweet potato";
-const SO_ADD={
- 1:"If 4 shakes aren't enough: small amounts of plain yogurt, leafy vegetables or tofu. Green and herbal tea, olive or avocado oil are fine. No caffeine, wheat or dairy this week.",
- 1.5:"Added from day 4: brown or mixed-grain rice, mushrooms, seaweed, low-sodium soy sauce, eggs, fish, skinless chicken. Still no caffeine, wheat or dairy.",
- 2:"New this week: beans and legumes, quinoa, nuts, kimchi, unsalted natural cheese, milk or unsweetened soy milk, black coffee.",
- 3:"New this week: tomatoes and berries. Sweet potato or banana before or after intense exercise.",
- 4:"New this week: 1 serving of fruit a day. Dinner is now low-carb instead of no-carb."};
-function soPlan(d){
-  const wk=d<=7?1:d<=14?2:d<=21?3:4;
-  const pre=SO_FAST[d+1]?"Tomorrow is a 24-hour fast: eat a filling high-protein dinner early tonight (by about 6 pm). See how the fast works below.":null;
-  if(d>28)return{wk:5,title:"After the 4 weeks",shakes:0,slots:[["Breakfast","Protein breakfast or a shake"],["Lunch",LC],["Dinner","Protein + vegetables"]],eat:"The plan doesn't describe what to do after week 4. Keep the 14:10 window, the foods-to-avoid list and protein at every meal.",train:"Your normal 6-day training plan.",fast:false};
-  if(SO_FAST[d])return{wk,title:"24-hour fast day",shakes:1,fastDay:true,slots:[["Breakfast","Fasting: no shake. Water, green or herbal tea"+(wk>=2?", or black coffee":"")],["Lunch","Fasting: water or tea only"],["Snack","3–4 pm: protein shake. This ends the fast"],["Dinner",(wk===4?LCD:CF)+", at your normal time"]],eat:wk===2?"Week 2 has 1 fast.":wk===3?"Week 3 has 2 fasts on non-consecutive days.":"Week 4 has 3 fasts on non-consecutive days.",train:"Rest, walking or gentle yoga only. Keep exercise moderate while fasting.",fast:true,note:"Move this fast to your Sunday or yoga day if it lands on a gym day."};
-  if(d<=3)return{wk,title:"Reset: shakes only",shakes:4,slots:[["Morning","Probiotic on an empty stomach"],["Breakfast","Protein shake"],["Lunch","Protein shake"],["Snack","Protein shake"],["Dinner","Protein shake"]],eat:SO_ADD[1],train:"Walk for at least 1 hour. No gym sessions on these 3 days.",fast:false,note:pre};
-  if(d<=7)return{wk,title:"Shakes + low-carb lunch",shakes:3,slots:[["Breakfast","Protein shake"],["Lunch",LC],["Snack","Afternoon protein shake"],["Dinner","Protein shake"]],eat:SO_ADD[1.5],train:"Walking plus light gym work: Pilates, yoga, light machines.",fast:false,note:pre};
-  return{wk,title:wk===2?"Week 2: first fast":wk===3?"Week 3: two fasts":"Week 4: three fasts",shakes:2,slots:[["Breakfast","Protein shake"],["Lunch",LC],["Snack","Afternoon protein shake"],["Dinner",wk===4?LCD:CF]],eat:SO_ADD[wk],train:"Full training plan, with high-intensity exercise at least 4 times this week."+(wk>=3?" Have a banana or sweet potato around HIIT.":""),fast:false,note:pre};
+function soPlan(d,vg){
+  const F=foods(vg),wk=d<=7?1:d<=14?2:d<=21?3:4,pre=!!SO_FAST[d+1]&&d<28;
+  const sleep=["Night","10:30 pm","😴 Sleep: at least 6 hours (7–8 is better)"],water=["Night","After dinner","💧 Water, green or herbal tea only until breakfast (14-hour overnight fast)"];
+  const dinnerNight=(txt)=>pre?["Night","6:00 pm","🍽️ Early dinner by 6 pm: "+txt+". Make it filling: your 24-hour fast starts after this."]:["Night","6:00 pm","🍽️ "+txt+". Last food of the day."];
+  if(d>28)return{wk:5,title:"After the 4 weeks",shakes:0,times:[["Morning","8:00 am","🍳 Protein breakfast or a "+F.shake],["Afternoon","12:30 pm","🍱 "+F.LC],["Afternoon","3:30 pm","🍎 Fruit or a shake"],["Afternoon","4:30 pm","🏋️ Your normal gym plan"],["Night","6:00 pm","🍽️ Protein + vegetables"],sleep],eat:"The plan doesn't describe what to do after week 4. Keep the 14:10 window, the foods-to-avoid list and protein at every meal.",fast:false};
+  if(SO_FAST[d])return{wk,title:"24-hour fast day",shakes:1,fastDay:true,times:[
+    ["Morning","7:30 am","💧 Water, green or herbal tea"+(wk>=2?", or 1 black coffee":"")],["Morning","8:00 am","⛔ No breakfast shake: you're fasting"],
+    ["Afternoon","12:30 pm","⛔ No lunch: water or tea only"],["Afternoon","3:30 pm","🥤 "+F.shake[0].toUpperCase()+F.shake.slice(1)+": this ends your fast"],["Afternoon","4:30 pm","🚶 Gentle walk or yoga only, no gym"],
+    ["Night","6:00–7:00 pm","🍽️ "+(wk===4?F.LCD:F.CF)+". Make it filling to protect your muscle."],water,sleep],
+    eat:wk===2?"Week 2 has 1 fast.":wk===3?"Week 3 has 2 fasts on non-consecutive days.":"Week 4 has 3 fasts on non-consecutive days.",fast:true,note:"Move this fast to your Sunday or yoga day if it lands on a gym day."};
+  if(d<=3)return{wk,title:"Reset: shakes only",shakes:4,times:[
+    ["Morning","7:30 am","💊 "+F.probiotic+" on an empty stomach + a big glass of water"],["Morning","8:00 am","🥤 Breakfast: "+F.shake],
+    ["Afternoon","12:30 pm","🥤 Lunch: "+F.shake],["Afternoon","3:30 pm","🥤 Snack: "+F.shake],["Afternoon","Any time","🚶 Walk for at least 1 hour (you can split it up). No gym today."],
+    dinnerNight("Dinner: "+F.shake),water,sleep],eat:F.hungry,fast:false};
+  if(d<=7)return{wk,title:"Shakes + low-carb lunch",shakes:3,times:[
+    ["Morning","7:30 am","💧 A big glass of water"],["Morning","8:00 am","🥤 Breakfast: "+F.shake],
+    ["Afternoon","12:30 pm","🍱 "+F.LC],["Afternoon","3:30 pm","🥤 Afternoon "+F.shake],["Afternoon","4:30 pm","🚶 Walk + light gym: Pilates, yoga, light machines"],
+    dinnerNight("Dinner: "+F.shake),water,sleep],eat:F.add15,fast:false};
+  const add={2:F.add2,3:"New this week: tomatoes and berries. Sweet potato or banana before or after intense exercise.",4:"New this week: 1 serving of fruit a day. Dinner is now low-carb instead of no-carb."}[wk];
+  return{wk,title:wk===2?"Week 2: first fast":wk===3?"Week 3: two fasts":"Week 4: three fasts",shakes:2,times:[
+    ["Morning","7:30 am","💧 Water"+(wk>=2?" and 1 black coffee if you like":"")],["Morning","8:00 am","🥤 Breakfast: "+F.shake],
+    ["Afternoon","12:30 pm","🍱 "+F.LC+(wk===4?" + 1 piece of fruit":"")],["Afternoon","3:30 pm","🥤 Afternoon "+F.shake+(wk>=3?" (+ a banana or sweet potato on HIIT days)":"")],["Afternoon","4:30 pm","🏋️ Workout: today's gym plan (high-intensity at least 4 times a week)"],
+    dinnerNight(wk===4?F.LCD:F.CF),water,sleep],eat:add,fast:false};
 }
-const FAST_GUIDE=`<div class="card" style="display:flex;flex-direction:column;gap:10px">
+function fastGuide(vg){const F=foods(vg);return `<div class="card" style="display:flex;flex-direction:column;gap:10px">
   <h3>How a 24-hour fast works</h3>
   <p class="muted" style="margin:0;font-size:14px">About 24 hours with nothing that has calories. You start after an early dinner and finish with the next day's afternoon shake, so most of the fast happens while you sleep. <b>A protein shake is food, so don't drink one until the afternoon: it ends the fast.</b></p>
   <div style="overflow-x:auto"><table><tbody>
-   <tr><th style="width:120px">Day before, ~6 pm</th><td>Early, filling high-protein dinner (fish, chicken, eggs or tofu + vegetables). <b>Fast starts.</b></td></tr>
+   <tr><th style="width:120px">Day before, ~6 pm</th><td>Early, filling high-protein dinner (${F.preDinner}). <b>Fast starts.</b></td></tr>
    <tr><th>Night</th><td>Sleep. Nothing to eat.</td></tr>
    <tr><th>Fast day, morning</th><td>No shake. Water, green, herbal or barley tea; black coffee from week 2.</td></tr>
    <tr><th>Lunchtime</th><td>Still fasting: water or tea only.</td></tr>
@@ -890,50 +955,62 @@ const FAST_GUIDE=`<div class="card" style="display:flex;flex-direction:column;ga
    <tr><th>Dinner, normal time</th><td>A filling high-protein, low-carb dinner to protect your muscle.</td></tr>
   </tbody></table></div>
   <div class="prog">
-   <div><span class="when" style="font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--accent-2)">ALLOWED WHILE FASTING</span><ul style="margin:4px 0 0;padding-left:20px;font-size:14px"><li>Water, sparkling water</li><li>Green, herbal, barley tea (no sugar)</li><li>Black coffee (from week 2)</li></ul></div>
-   <div><span class="when" style="font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--accent)">NOT ALLOWED</span><ul style="margin:4px 0 0;padding-left:20px;font-size:14px"><li>Protein shakes before the afternoon</li><li>Milk, soy milk, fruit, snacks</li><li>Sweetened or "zero" sweetener drinks</li></ul></div>
+   <div><span style="font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--accent-2)">ALLOWED WHILE FASTING</span><ul style="margin:4px 0 0;padding-left:20px;font-size:14px"><li>Water, sparkling water</li><li>Green, herbal, barley tea (no sugar)</li><li>Black coffee (from week 2)</li></ul></div>
+   <div><span style="font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--accent)">NOT ALLOWED</span><ul style="margin:4px 0 0;padding-left:20px;font-size:14px"><li>Protein shakes before the afternoon</li><li>Milk, soy milk, fruit, snacks</li><li>Sweetened or "zero" sweetener drinks</li></ul></div>
   </div>
   <span class="muted" style="font-size:13px">Week 2: 1 fast, week 3: 2, week 4: 3, never on two days in a row. Put them on your Sunday rest day or Saturday yoga day. If you feel dizzy, shaky or faint, drink your shake early and stop the fast. Hunger comes in waves and usually passes in 15–20 minutes.</span>
- </div>`;
-function soSection(){
+ </div>`;}
+function soTimeline(p){
+  const ic={Morning:"☀️",Afternoon:"🌤️",Night:"🌙"};
+  return `<div class="tl-wrap">${["Morning","Afternoon","Night"].map(per=>{const rows=p.times.filter(t=>t[0]===per);if(!rows.length)return"";
+    return `<div class="tl"><div class="tl-h tl-${per.toLowerCase()}">${ic[per]} ${per}</div>${rows.map(r=>`<div class="tl-r"><span class="tl-t">${r[1]}</span><span>${esc(r[2])}</span></div>`).join("")}</div>`;}).join("")}</div>`;
+}
+function soSection(vg){
+  const F=foods(vg);
   const weeks=`<div style="overflow-x:auto"><table><thead><tr><th>Days</th><th>Breakfast</th><th>Lunch</th><th>Snack</th><th>Dinner</th><th>24-h fasts</th></tr></thead><tbody>
    <tr><td><b>1–3</b></td><td>Shake</td><td>Shake</td><td>Shake</td><td>Shake</td><td>–</td></tr>
    <tr><td><b>4–7</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>Shake</td><td>–</td></tr>
-   <tr><td><b>Week 2</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>Carb-free protein</td><td class="n">1</td></tr>
-   <tr><td><b>Week 3</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>Carb-free protein</td><td class="n">2</td></tr>
+   <tr><td><b>Week 2</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>No-carb protein</td><td class="n">1</td></tr>
+   <tr><td><b>Week 3</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>No-carb protein</td><td class="n">2</td></tr>
    <tr><td><b>Week 4</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>Low-carb meal</td><td class="n">3</td></tr></tbody></table></div>
-   <span class="muted" style="font-size:12.5px">Low-carb meal = ½ bowl mixed grains + fish, tofu, skinless chicken, eggs, tempeh, mushrooms or seaweed. No-carb dinner = fish, chicken, eggs or tofu with vegetables. No beef or pork in this app's version. Fasts start after an early dinner and end with the next day's afternoon shake. Sources: Ro and Everyday Health write-ups of the Korean Switch-On diet.</span>`;
+   <span class="muted" style="font-size:12.5px">${vg?"Vegan version: protein comes from tofu, tempeh, edamame and (from week 2) lentils and beans.":"No beef or pork in this app's version."} Fasts start after an early dinner and end with the next day's afternoon shake. Sources: Ro and Everyday Health write-ups of the Korean Switch-On diet.</span>`;
   const daily=`<div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>Every day, all 4 weeks</h3>
    <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:14px">
     <li>More than 8 cups (2 L) of water</li><li>6+ hours of sleep</li>
-    <li>14:10 eating window: eat only within 10 hours, e.g. 8 am – 6 pm (on non-fasting days)</li>
+    <li>14:10 eating window: food only between 8 am and 6 pm (on non-fasting days)</li>
     <li>High-intensity exercise at least 4 times a week (not on days 1–3 or fast days)</li></ul></div>`;
+  const avoid=vg?`<li>All meat, fish, eggs and dairy</li><li>Hidden animal products: fish-sauce kimchi, anchovy broth (멸치육수), whey protein</li>`:`<li>Beef and pork (your choice)</li>`;
+  const supps=vg?`<li><b>Vitamin B12</b> (essential on a vegan diet)</li><li>Algae omega-3 (instead of fish oil)</li><li>Vitamin D</li><li>Vegan multivitamin</li><li>Vitamin C</li><li>CoQ10 (choose a vegan capsule)</li>`:`<li>Multivitamin</li><li>Omega-3</li><li>Vitamin C</li><li>CoQ10</li>`;
   const rules=daily+`<div class="prog">
    <div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>Foods to avoid (all 4 weeks)</h3>
     <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:14px">
-     <li>Sugar and sugary foods and drinks</li><li>Milk with added sugar</li><li>Anything made with flour (bread, pasta, ramen, tteok, pancakes)</li><li>Caffeine in week 1 (later: 1 black coffee is fine)</li><li>Alcohol</li><li>Foods high in saturated or trans fat (fried food, chicken skin)</li><li>Beef and pork (your choice)</li><li>Artificial sweeteners</li><li>Salty foods</li></ul></div>
+     <li>Sugar and sugary foods and drinks</li><li>Milk with added sugar</li><li>Anything made with flour (bread, pasta, ramen, tteok, pancakes${vg?", seitan":""})</li><li>Caffeine in week 1 (later: 1 black coffee is fine)</li><li>Alcohol</li><li>Fried and fatty food</li>${avoid}<li>Artificial sweeteners</li><li>Salty foods</li></ul></div>
    <div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>Supplements, morning and night</h3>
-    <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:14px"><li>Multivitamin</li><li>Omega-3</li><li>Vitamin C</li><li>CoQ10</li></ul>
-    <span class="muted" style="font-size:13px">The plan recommends these but doesn't give doses: follow each label. Ask a pharmacist first if you take any medication; CoQ10 and omega-3 can interact with blood thinners.</span></div></div>`;
-  const shake=`<div class="tip"><b>Shake:</b> 1 scoop whey or plant protein (about 20 g protein) with water or unsweetened soy milk, or a Korean diet shake. No added sugar or artificial sweeteners, as the plan avoids both.</div>`;
-  if(!S.soStart)return `<div class="card" style="display:flex;flex-direction:column;gap:12px"><h3>Your Switch-On tracker</h3>
-    <p class="muted" style="margin:0;font-size:14px">Start today and the app shows what to drink, eat and train each day for 28 days, and lets you tick off your shakes.</p>
-    <div class="row"><button class="btn" id="soStart">Start my Switch-On today</button></div>${weeks}${shake}</div>${rules}<details class="card"><summary style="cursor:pointer;font-weight:700">How a 24-hour fast works</summary>${FAST_GUIDE}</details>`;
-  const d=Math.floor((new Date(iso(new Date()))-new Date(S.soStart))/864e5)+1;const p=soPlan(d);
+    <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:14px">${supps}</ul>
+    <span class="muted" style="font-size:13px">The plan recommends supplements but doesn't give doses: follow each label. Ask a pharmacist first if you take any medication; CoQ10 and omega-3 can interact with blood thinners.${vg?" A dietitian can check your B12, iron and calcium.":""}</span></div></div>`;
+  const shake=`<div class="tip"><b>Shake:</b> ${vg?"1 scoop pea or soy protein (20–25 g protein; check it has no whey)":"1 scoop whey or plant protein (about 20 g protein)"} with water or unsweetened soy milk. No added sugar or artificial sweeteners.</div>`;
+  const started=!!S.soStart;
+  const today=started?Math.floor((new Date(iso(new Date()))-new Date(S.soStart))/864e5)+1:0;
+  const view=soView||(started?Math.max(1,today):1);
+  const p=soPlan(view,vg),isToday=started&&view===today;
   const done=(S.soLog||{})[iso(new Date())]||0;
-  const circles=p.shakes?`<div class="row" id="soShakes" aria-label="Shakes drunk today">${Array.from({length:p.shakes},(_,k)=>`<button class="btn small ${k<done?"mint":"ghost"}" data-n="${k+1}" aria-pressed="${k<done}">🥤 ${k+1}</button>`).join("")}<span class="muted" style="font-size:13px">${done}/${p.shakes} shakes today</span></div>`:"";
-  return `<div class="card" style="display:flex;flex-direction:column;gap:12px">
-   <div class="row" style="justify-content:space-between"><div><span class="eyebrow">${d>28?"Program complete":`Day ${d} of 28 · week ${p.wk}`}</span><h3 style="font-size:20px">${esc(p.title)}</h3></div><button class="btn small ghost" id="soRestart">Restart</button></div>
-   <div class="bar"><i style="width:${Math.min(100,Math.round(d/28*100))}%"></i></div>
+  const circles=isToday&&p.shakes?`<div class="row" id="soShakes" aria-label="Shakes drunk today">${Array.from({length:p.shakes},(_,k)=>`<button class="btn small ${k<done?"mint":"ghost"}" data-n="${k+1}" aria-pressed="${k<done}">🥤 ${k+1}</button>`).join("")}<span class="muted" style="font-size:13px">${done}/${p.shakes} shakes today</span></div>`:"";
+  const nav=`<div class="row so-nav"><button class="btn small ghost" data-sonav="${view-1}" ${view<=1?"disabled":""} aria-label="Previous day">‹ Day ${Math.max(1,view-1)}</button>
+    ${started&&!isToday&&today>=1?`<button class="btn small" data-sonav="today">Today</button>`:""}
+    <button class="btn small ghost" data-sonav="${view+1}" ${view>=28?"disabled":""} aria-label="Next day">Day ${Math.min(28,view+1)} ›</button></div>`;
+  const label=view>28?"Program complete":`Day ${view} of 28 · week ${p.wk}`+(isToday?" · TODAY":started?"":" · preview");
+  const guide=(p.fastDay||(SO_FAST[view+1]&&view<28))?fastGuide(vg):`<details class="card"><summary style="cursor:pointer;font-weight:700">How a 24-hour fast works</summary>${fastGuide(vg)}</details>`;
+  return `<div class="card" id="soCard" style="display:flex;flex-direction:column;gap:12px">
+   ${started?"":`<div style="display:flex;flex-direction:column;gap:8px"><h3>Your Switch-On tracker</h3><p class="muted" style="margin:0;font-size:14px">Press Start on the day you begin. Until then you can preview every day below.</p><div class="row"><button class="btn" id="soStart">Start my Switch-On today</button></div></div>`}
+   <div class="row" style="justify-content:space-between"><div><span class="eyebrow">${label}</span><h3 style="font-size:20px">${esc(p.title)}</h3></div>${started?`<button class="btn small ghost" id="soRestart">Restart</button>`:""}</div>
+   <div class="bar"><i style="width:${Math.min(100,Math.round(view/28*100))}%"></i></div>
+   ${nav}
    ${circles}
-   <div style="overflow-x:auto"><table><tbody>${p.slots.map(s=>`<tr><th style="width:90px">${s[0]}</th><td>${esc(s[1])}</td></tr>`).join("")}</tbody></table></div>
-   <div class="meals">
-    <div class="meal"><span class="when">Food rules</span><span style="font-size:14px">${esc(p.eat)}</span></div>
-    <div class="meal"><span class="when">Train</span><span style="font-size:14px">${esc(p.train)}</span></div>
-   </div>
+   ${soTimeline(p)}
+   <div class="meal"><span class="when">Food rules</span><span style="font-size:14px">${esc(p.eat)}</span></div>
    ${p.note?`<span class="muted" style="font-size:13px">${esc(p.note)}</span>`:""}
    <details><summary style="cursor:pointer;font-weight:600">See all 4 weeks</summary>${weeks}</details>${shake}</div>
-  ${(p.fastDay||SO_FAST[d+1])?FAST_GUIDE:(d>=8&&d<=28?`<details class="card"><summary style="cursor:pointer;font-weight:700">How a 24-hour fast works</summary>${FAST_GUIDE}</details>`:"")}${rules}
+  ${guide}${rules}
   <div class="warn"><b>Before you start.</b> Days 1–3 are only about 600–700 kcal; dietitians call that below what's safe for most adults without medical supervision. Expect tiredness, headaches or dizziness, and keep those days to walking only. Never put a 24-hour fast on a gym day: long fasts raise the risk of low blood sugar, so if you feel dizzy, shaky or faint, drink your shake early and stop the fast. Talk to a doctor or dietitian first if you have a health condition, take medication, have diabetes or low blood sugar, or have a history of disordered eating. Stop and eat normally if you feel faint or your period stops. The 4-week plan itself hasn't been tested in clinical trials.</div>`;
 }
 
