@@ -845,7 +845,39 @@ const VMENU=[
 ];
 const VSWAPS=[["Kimchi with fish sauce or shrimp","Vegan kimchi (비건 김치)"],["Anchovy broth (멸치육수)","Kelp and mushroom broth"],["Whey protein (milk)","Pea or soy protein"],["Egg in bibimbap or sundubu","Extra tofu"],["Dairy yogurt","Unsweetened soy yogurt"],["Fish oil","Algae omega-3"],["Seitan (wheat gluten)","Tofu, tempeh, edamame (no flour on this plan)"]];
 const VGROCERY=["Pea or soy protein powder","Vegan probiotic","Firm tofu (calcium-set) and soft tofu (순두부)","Tempeh, edamame","Lentils, chickpeas, black beans (week 2+)","Mixed-grain or brown rice, quinoa","Mushrooms, spinach, bean sprouts, zucchini","Cabbage, cucumber, lettuce & perilla leaves","Seaweed: miyeok, gim, kelp for broth","Vegan kimchi (비건 김치)","Doenjang (check: no anchovy)","Low-sodium soy sauce","Unsweetened fortified soy milk & soy yogurt","Nuts, berries, tomatoes","Sweet potatoes (고구마)","Green and barley tea"];
-function foods(vg){return vg?{
+/* ---------- Indian vegan food style ---------- */
+const FOOD_IV={
+  chips:'<span class="chip">🇮🇳 Indian vegan</span><span class="chip">🫘 Tofu · soya chunks · dal</span><span class="chip">🥬 Sabzi</span><span class="chip">No paneer, dahi or ghee</span><span class="chip">No roti or besan</span>',
+  shake:"vegan protein shake (pea or soy)",probiotic:"Vegan probiotic",
+  hungry:"",
+  LC:"Low-carb lunch: ½ bowl brown rice or millet + tofu or soya chunks + sabzi",
+  CF:"No-carb dinner: tofu or soya chunks (dal from week 2) + 2 cups sabzi, no rice",
+  LCD:"Low-carb dinner: tofu, soya chunks or dal + sabzi + 100 g shakarkandi",
+  add15:"Added from day 4: brown rice, red rice or millet (½ bowl at lunch), tofu, soya chunks, tempeh, edamame, mushrooms and sabzi. Still no caffeine or wheat (no roti).",
+  add2:"New this week: moong, masoor, chana, rajma, moong sprouts, quinoa, nuts, plain soy curd, unsweetened soy milk, black coffee.",
+  protein:"tofu, soya chunks, dal",preDinner:"tofu or soya chunks + sabzi"
+};
+const IMENU=[
+ ["Tofu palak","टोफू पालक","150 g tofu in spinach gravy (1 tsp oil, no cream) + 100 g brown rice + cucumber salad",430,26,"Lunch"],
+ ["Soya chunk sabzi","सोया चंक सब्ज़ी","50 g dry soya chunks with capsicum and onion + 100 g foxtail millet (kangni)",420,30,"Lunch"],
+ ["Tofu bhurji","टोफू भुर्जी","150 g crumbled tofu with onion, tomato and haldi + 100 g red rice + French beans sabzi",420,25,"Lunch"],
+ ["Tofu tikka bowl","टोफू टिक्का","150 g grilled tofu tikka (spices + lemon, no curd) + 100 g brown rice + mint chutney (no sugar)",410,25,"Lunch"],
+ ["Moong dal & rice","मूंग दाल चावल","1 cup moong dal + 100 g brown rice + lauki sabzi (week 2+)",420,20,"Lunch"],
+ ["Rajma or chole bowl","राजमा / छोले","1 cup rajma or chole (1 tsp oil) + 100 g brown rice + onion-cucumber salad (week 2+)",470,19,"Lunch"],
+ ["Tofu mushroom masala","टोफू मशरूम मसाला","200 g tofu + mushrooms + 2 cups cauliflower sabzi, no rice",380,30,"Dinner"],
+ ["Soya palak curry","सोया पालक","50 g soya chunks in spinach gravy + 1 cup tori sabzi, no rice",320,29,"Dinner"],
+ ["Tofu tikka + salad","टोफू टिक्का सलाद","200 g tofu tikka + big cucumber, cabbage and carrot salad with lemon",360,30,"Dinner"],
+ ["Sprouts chaat + tofu","स्प्राउट्स चाट","1 cup moong sprouts + 100 g tofu + onion, tomato, lemon, chaat masala (week 2+)",300,22,"Dinner"]
+];
+const ISWAPS=[["Paneer","Tofu"],["Dahi or raita","Plain unsweetened soy curd (week 2+)"],["Ghee or butter","1 tsp mustard, olive or groundnut oil"],["Roti, naan, paratha, puri","½ bowl brown rice or millet (lunch only)"],["Masala chai with milk and sugar","Green tea, or black coffee from week 2"],["Pakora, samosa, namkeen","Roasted chana (week 2+) or cucumber sticks"],["Achar, papad","Skip them (too salty)"],["Jaggery, mithai","None for 4 weeks; fruit from week 4"],["Whey protein","Pea or soy protein labelled vegan"]];
+const IGROCERY=["Pea or soy protein powder (vegan)","Vegan probiotic","Firm tofu","Soya chunks (meal maker)","Tempeh, edamame (if available)","Moong, masoor, chana, rajma (week 2+)","Moong for sprouting","Brown rice, red rice","Foxtail, little or barnyard millet","Quinoa (week 2+)","Palak, methi, lauki, tori, tinda, bhindi","Cauliflower, cabbage, French beans, capsicum","Mushrooms, cucumber, carrot, tomato","Shakarkandi (sweet potato)","Mustard / olive / groundnut oil","Haldi, jeera, dhania, garam masala, hing","Plain unsweetened soy curd & soy milk","Green tea","Guava, papaya, apple, pomegranate (week 4)"];
+function indIdeas(kg){return `
+  <div><h2>Indian vegan meal ideas</h2><span class="muted" style="font-size:13.5px">Lunch with ½ bowl brown rice or millet; from week 2, dinner with no rice. Dal, chana and rajma come back in week 2. Cook with 1 tsp oil, no ghee or cream.</span></div>
+  <div class="meals">${IMENU.map(m=>`<div class="card meal"><span class="when">${m[5]}</span><span class="nm">${esc(m[0])}</span><span class="ko">${m[1]}</span><span class="muted" style="font-size:13.5px">${esc(m[2])}</span><span class="nut">~${m[3]} kcal · ${m[4]} g protein</span></div>`).join("")}</div>
+  <div class="card"><h3>Getting enough protein (aim ${Math.round(kg*1.6)} g a day)</h3><div style="overflow-x:auto"><table><tbody>
+   <tr><td>Vegan shake</td><td class="n">20–25 g</td></tr><tr><td>Firm tofu, 150 g</td><td class="n">~20 g</td></tr><tr><td>Soya chunks, 50 g dry</td><td class="n">~26 g</td></tr><tr><td>Tempeh, 100 g</td><td class="n">~19 g</td></tr><tr><td>Cooked dal, chana or rajma, 1 cup (week 2+)</td><td class="n">~15–18 g</td></tr></tbody></table></div>
+   <span class="muted" style="font-size:13px">Besan (chickpea flour) in chilla, pakora or kadhi counts as flour, so leave it out during the 4 weeks.</span></div>`;}
+function foods(m){if(m===true)m="v";if(!m)m="s";if(m==="iv")return FOOD_IV;return m==="v"?{
   chips:'<span class="chip">🌱 Vegan</span><span class="chip">🫘 Tofu · tempeh · edamame</span><span class="chip">🥬 Vegetables</span><span class="chip">No meat, fish, eggs or dairy</span>',
   shake:"vegan protein shake (pea or soy)",probiotic:"Vegan probiotic",
   hungry:"If 4 shakes aren't enough: small amounts of plain unsweetened soy yogurt, tofu or leafy vegetables. Green and herbal tea, olive or avocado oil are fine. No caffeine or wheat this week.",
@@ -869,10 +901,10 @@ function foods(vg){return vg?{
 let soView=null; // which Switch-On day is being viewed (null = today)
 function renderDiet(){
   if(dietDay===null)dietDay=todayIdx();
-  const vg=!!S.vegan,F=foods(vg);
+  const m=S.food||(S.vegan?"v":"s"),vg=m!=="s",ind=m==="iv",F=foods(m);
   const day=KMENU[dietDay],tk=day.reduce((a,m)=>a+m[4],0),tp=day.reduce((a,m)=>a+m[5],0),kg=kgVal(),target=kcalTarget();
   const diff=target-tk;
-  const ideas=vg?`
+  const ideas=ind?indIdeas(kg):vg?`
   <div><h2>Vegan K-food meal ideas</h2><span class="muted" style="font-size:13.5px">Use these for your low-carb lunch (with ½ bowl mixed grains) and, from week 2, your no-carb dinner (no rice). Lentils and kimchi come back in week 2.</span></div>
   <div class="meals">${VMENU.map(m=>`<div class="card meal"><span class="when">${m[5]}</span><span class="nm">${esc(m[0])}</span><span class="ko">${m[1]}</span><span class="muted" style="font-size:13.5px">${esc(m[2])}</span><span class="nut">~${m[3]} kcal · ${m[4]} g protein</span></div>`).join("")}</div>
   <div class="card"><h3>Getting enough vegan protein (aim ${Math.round(kg*1.6)} g a day)</h3><div style="overflow-x:auto"><table><tbody>
@@ -886,19 +918,19 @@ function renderDiet(){
   <div class="diet-top">
    <div class="card" style="display:flex;flex-direction:column;gap:10px"><span class="eyebrow">Switch-On diet · 스위치온 다이어트</span><h2>4 weeks: protein shakes, one protein meal, then fasting days</h2>
     <p class="muted" style="margin:0">The Korean Switch-On diet (Dr. Park Yong-woo): 3 weeks built on protein shakes plus a low-carb protein lunch, 24-hour fasts from week 2, and fruit back in week 4. This tracker follows the Ro and Everyday Health write-ups.</p>
-    <div class="seg" id="dietMode" role="group" aria-label="Food style"><button data-v="0" aria-pressed="${!vg}">🐔 Chicken · egg · fish</button><button data-v="1" aria-pressed="${vg}">🌱 Vegan</button></div>
+    <div class="seg" id="dietMode" role="group" aria-label="Food style"><button data-v="s" aria-pressed="${m==="s"}">🐔 Chicken · egg · fish</button><button data-v="v" aria-pressed="${m==="v"}">🌱 Vegan</button><button data-v="iv" aria-pressed="${ind}">🇮🇳 Indian vegan</button></div>
     <div class="chips">${F.chips}</div></div>
    <div class="card" style="display:flex;flex-direction:column;gap:10px"><h3>Your daily target</h3>
     <div class="stats"><div class="stat"><div class="v mono">${target}</div><div class="l">kcal / day from week 4</div></div><div class="stat"><div class="v mono">${Math.round(kg*1.6)}+</div><div class="l">g protein</div></div><div class="stat"><div class="v mono">2 L</div><div class="l">water / tea</div></div></div>
     <span class="muted" style="font-size:13px">Based on 149 cm, ${kg} kg, age 22 and 6 training days, minus a gentle 350 kcal for fat loss. Log your weight in Progress to update it.</span></div>
   </div>
-  ${soSection(vg)}
+  ${soSection(m)}
   <div class="card" style="display:flex;flex-direction:column;gap:10px"><h3>Your protein meal plate</h3>
-   <div class="plate"><div><b>½</b>vegetables & namul<span class="ko">나물 · 채소</span></div><div><b>¼</b>protein: ${F.protein}<span class="ko">단백질</span></div><div><b>¼</b>multigrain rice or sweet potato<span class="ko">잡곡밥 · 고구마</span></div><div><b>+1</b>soup or ${vg?"vegan ":""}kimchi on the side<span class="ko">국 · 김치</span></div></div></div>
+   <div class="plate"><div><b>½</b>vegetables & namul<span class="ko">나물 · 채소</span></div><div><b>¼</b>protein: ${F.protein}<span class="ko">단백질</span></div><div><b>¼</b>${ind?"brown rice, millet or shakarkandi":"multigrain rice or sweet potato"}<span class="ko">잡곡밥 · 고구마</span></div><div><b>+1</b>${ind?"salad or thin dal (week 2+) on the side":"soup or "+(vg?"vegan ":"")+"kimchi on the side"}<span class="ko">국 · 김치</span></div></div></div>
   ${ideas}
   <div class="prog">
-   <div class="card"><h3>${vg?"Vegan swaps":"Smart K-food swaps"}</h3><div style="overflow-x:auto"><table class="swaps"><thead><tr><th>Instead of</th><th>Choose</th></tr></thead><tbody>${(vg?VSWAPS:KSWAPS).map(s=>`<tr><td>${esc(s[0])}</td><td>${esc(s[1])}</td></tr>`).join("")}</tbody></table></div></div>
-   <div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>Korean habits that help</h3>
+   <div class="card"><h3>${ind?"Indian vegan swaps":vg?"Vegan swaps":"Smart K-food swaps"}</h3><div style="overflow-x:auto"><table class="swaps"><thead><tr><th>Instead of</th><th>Choose</th></tr></thead><tbody>${(ind?ISWAPS:vg?VSWAPS:KSWAPS).map(s=>`<tr><td>${esc(s[0])}</td><td>${esc(s[1])}</td></tr>`).join("")}</tbody></table></div></div>
+   <div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>${ind?"Habits that help":"Korean habits that help"}</h3>
     <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px">
      <li>Start with soup and vegetables, then protein, rice last.</li>
      <li>Use chopsticks and eat slowly, about 20 minutes a meal.</li>
@@ -907,10 +939,10 @@ function renderDiet(){
      <li>Kimchi, soy sauce and jjigae are salty: one salty dish per meal, and leave most of the soup liquid.</li>
     </ol></div>
   </div>
-  <div class="card"><h3>Shopping list (Korean mart / 마트)</h3><ul class="grocery">${(vg?VGROCERY:KGROCERY).map(g=>`<li>${esc(g)}</li>`).join("")}</ul></div>
+  <div class="card"><h3>${ind?"Shopping list (kirana / supermarket)":"Shopping list (Korean mart / 마트)"}</h3><ul class="grocery">${(ind?IGROCERY:vg?VGROCERY:KGROCERY).map(g=>`<li>${esc(g)}</li>`).join("")}</ul></div>
   <div class="warn"><b>Don't stretch the shake-only days.</b> Staying on 600–800 kcal for weeks, or viral "idol diets" like paper-cup meals, cause muscle loss, hair loss, missed periods and rebound weight gain. Switch-On adds food back after day 3 on purpose. Calorie numbers are estimates.</div>`;
   const dd=$("#dietDays");dd&&dd.querySelectorAll("button").forEach(b=>b.onclick=()=>{dietDay=+b.dataset.d;renderDiet();});
-  document.querySelectorAll("#dietMode button").forEach(b=>b.onclick=()=>{S.vegan=b.dataset.v==="1";save();renderDiet();});
+  document.querySelectorAll("#dietMode button").forEach(b=>b.onclick=()=>{S.food=b.dataset.v;S.vegan=S.food!=="s";save();renderDiet();});
   const st=$("#soStart");st&&(st.onclick=()=>{S.soStart=iso(new Date());S.soLog={};soView=null;save();renderDiet();renderAll();});
   const rs=$("#soRestart");rs&&(rs.onclick=()=>{if(rs.dataset.arm){S.soStart=null;S.soLog={};soView=null;save();renderDiet();renderAll();}else{rs.dataset.arm="1";rs.textContent="Tap again to restart";}});
   document.querySelectorAll("#soShakes button").forEach(b=>b.onclick=()=>{S.soLog=S.soLog||{};const t=iso(new Date()),n=+b.dataset.n;S.soLog[t]=(S.soLog[t]===n?n-1:n);save();renderDiet();});
@@ -967,11 +999,35 @@ const SO_MEALS={
  },
  fruit:["1 cup (150 g) mixed berries","1 small apple","½ Korean pear (배)","1 orange","2 kiwis","1 cup strawberries","1 small banana"]
 };
+SO_MEALS.iv={
+  shake:"1 scoop (≈30 g) pea or soy protein + 250 ml unsweetened soy milk (≈180 kcal, ≈28 g protein)",
+  hungry:"Only if very hungry: 100 g plain soy curd, 100 g silken tofu, or a cucumber and carrot salad with lemon",
+  lunch:[
+   "Tofu palak: 150 g tofu in spinach gravy (1 tsp oil, no cream) + 100 g cooked brown rice (½ bowl) + cucumber salad",
+   "Soya chunk sabzi: 50 g dry soya chunks with capsicum and onion + 100 g cooked foxtail millet (kangni)",
+   "Tofu bhurji: 150 g crumbled tofu with onion, tomato and haldi + 100 g cooked red rice + 1 cup French beans sabzi",
+   "Tofu tikka bowl: 150 g grilled tofu tikka (spices + lemon, no curd) + 100 g cooked brown rice + mint chutney (no sugar)",
+   "Mushroom & tofu pulao: 100 g cooked brown rice with 100 g tofu, mushrooms and peas + cucumber salad"],
+  lunch2:[
+   "Moong dal & rice: 1 cup moong dal + 100 g cooked brown rice + 1 cup lauki sabzi",
+   "Rajma or chole bowl: 1 cup rajma or chole (1 tsp oil) + 100 g cooked brown rice + onion-cucumber salad"],
+  dinner:[
+   "Tofu mushroom masala: 200 g tofu + 1 cup mushrooms + 2 cups cauliflower sabzi (no rice)",
+   "Soya palak curry: 50 g dry soya chunks in spinach gravy + 1 cup tori sabzi (no rice)",
+   "Tofu tikka + salad: 200 g grilled tofu tikka + big cucumber, cabbage and carrot salad with lemon",
+   "Tofu methi sabzi: 200 g tofu with methi and onion + 1 cup bhindi sabzi (no rice)",
+   "Soya chunk & cabbage stir-fry: 50 g dry soya chunks + 2 cups cabbage and capsicum (no rice)"],
+  dinner2:["Moong dal soup + tofu: 1 cup thin moong dal + 100 g tofu + 1 cup tinda sabzi","Sprouts chaat + tofu: 1 cup moong sprouts + 100 g tofu + onion, tomato, lemon, chaat masala"],
+  carb:"100 g roasted shakarkandi (sweet potato, ≈90 kcal) or ⅓ bowl brown rice",
+  hiit:"1 small banana or 100 g roasted shakarkandi with your afternoon shake on HIIT days",
+  fruit:["1 guava","1 cup papaya","1 small apple","½ cup pomegranate","1 orange","1 cup watermelon","1 small banana"]
+};
 function soMeal(list,list2,d,wk){const all=wk>=2?list.concat(list2):list;return all[(d-1)%all.length];}
-function soPlan(d,vg){
-  const F=foods(vg),M=SO_MEALS[vg?"v":"s"],wk=d<=7?1:d<=14?2:d<=21?3:4,pre=!!SO_FAST[d+1]&&d<28;
+function soPlan(d,m){
+  m=m===true?"v":(m||"s");const vg=m!=="s";
+  const F=foods(m),M=SO_MEALS[m],wk=d<=7?1:d<=14?2:d<=21?3:4,pre=!!SO_FAST[d+1]&&d<28;
   const SH=vg?"Vegan shake":"Shake",shk=SH+": "+M.shake;
-  const lunch=soMeal(M.lunch,M.lunch2,d,wk),dinner=soMeal(M.dinner,M.dinner2,d,wk),fruit=SO_MEALS.fruit[(d-1)%SO_MEALS.fruit.length];
+  const lunch=soMeal(M.lunch,M.lunch2,d,wk),dinner=soMeal(M.dinner,M.dinner2,d,wk),fruit=(M.fruit||SO_MEALS.fruit)[(d-1)%(M.fruit||SO_MEALS.fruit).length];
   const dinnerTxt=wk===4?dinner+" + "+M.carb:dinner;
   const sleep=["Night","10:30 pm","😴 Sleep: at least 6 hours (7–8 is better)"],water=["Night","After dinner","💧 Water, green or herbal tea only until breakfast (14-hour overnight fast)"];
   const dinnerNight=(txt)=>pre?["Night","6:00 pm","🍽️ Early dinner by 6 pm: "+txt+". Make it filling: your 24-hour fast starts after this."]:["Night","6:00 pm","🍽️ "+txt+". Last food of the day."];
@@ -992,10 +1048,10 @@ function soPlan(d,vg){
   const add={2:F.add2,3:"New this week: tomatoes and berries. "+M.hiit+".",4:"New this week: 1 serving of fruit a day. Dinner now includes "+M.carb+"."}[wk];
   return{wk,title:wk===2?"Week 2: first fast":wk===3?"Week 3: two fasts":"Week 4: three fasts",shakes:2,times:[
     ["Morning","7:30 am","💧 Water"+(wk>=2?" and 1 black coffee if you like":"")],["Morning","8:00 am","🥤 Breakfast. "+shk],
-    ["Afternoon","12:30 pm","🍱 "+lunch+(wk===4?" + "+fruit:"")],["Afternoon","3:30 pm","🥤 Afternoon "+SH.toLowerCase()+" (same recipe)"+(wk>=3?". On HIIT days add 1 small banana or 100 g roasted sweet potato":"")],["Afternoon","4:30 pm","🏋️ Workout: today's gym plan (high-intensity at least 4 times a week)"],
+    ["Afternoon","12:30 pm","🍱 "+lunch+(wk===4?" + "+fruit:"")],["Afternoon","3:30 pm","🥤 Afternoon "+SH.toLowerCase()+" (same recipe)"+(wk>=3?". On HIIT days add "+M.hiit.replace(" with your afternoon shake on HIIT days",""):"")],["Afternoon","4:30 pm","🏋️ Workout: today's gym plan (high-intensity at least 4 times a week)"],
     dinnerNight(dinnerTxt),water,sleep],eat:add,fast:false};
 }
-function fastGuide(vg){const F=foods(vg);return `<div class="card" style="display:flex;flex-direction:column;gap:10px">
+function fastGuide(m){const F=foods(m);return `<div class="card" style="display:flex;flex-direction:column;gap:10px">
   <h3>How a 24-hour fast works</h3>
   <p class="muted" style="margin:0;font-size:14px">About 24 hours with nothing that has calories. You start after an early dinner and finish with the next day's afternoon shake, so most of the fast happens while you sleep. <b>A protein shake is food, so don't drink one until the afternoon: it ends the fast.</b></p>
   <div style="overflow-x:auto"><table><tbody>
@@ -1017,26 +1073,26 @@ function soTimeline(p){
   return `<div class="tl-wrap">${["Morning","Afternoon","Night"].map(per=>{const rows=p.times.filter(t=>t[0]===per);if(!rows.length)return"";
     return `<div class="tl"><div class="tl-h tl-${per.toLowerCase()}">${ic[per]} ${per}</div>${rows.map(r=>`<div class="tl-r"><span class="tl-t">${r[1]}</span><span>${esc(r[2])}</span></div>`).join("")}</div>`;}).join("")}</div>`;
 }
-function soSection(vg){
-  const F=foods(vg);
+function soSection(m){
+  const vg=m!=="s",ind=m==="iv",F=foods(m);
   const weeks=`<div style="overflow-x:auto"><table><thead><tr><th>Days</th><th>Breakfast</th><th>Lunch</th><th>Snack</th><th>Dinner</th><th>24-h fasts</th></tr></thead><tbody>
    <tr><td><b>1–3</b></td><td>Shake</td><td>Shake</td><td>Shake</td><td>Shake</td><td>–</td></tr>
    <tr><td><b>4–7</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>Shake</td><td>–</td></tr>
    <tr><td><b>Week 2</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>No-carb protein</td><td class="n">1</td></tr>
    <tr><td><b>Week 3</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>No-carb protein</td><td class="n">2</td></tr>
    <tr><td><b>Week 4</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>Low-carb meal</td><td class="n">3</td></tr></tbody></table></div>
-   <span class="muted" style="font-size:12.5px">${vg?"Vegan version: protein comes from tofu, tempeh, edamame and (from week 2) lentils and beans.":"No beef or pork in this app's version."} Fasts start after an early dinner and end with the next day's afternoon shake. Sources: Ro and Everyday Health write-ups of the Korean Switch-On diet.</span>`;
+   <span class="muted" style="font-size:12.5px">${ind?"Indian vegan version: protein comes from tofu, soya chunks, tempeh and (from week 2) dal, chana and rajma.":vg?"Vegan version: protein comes from tofu, tempeh, edamame and (from week 2) lentils and beans.":"No beef or pork in this app's version."} Fasts start after an early dinner and end with the next day's afternoon shake. Sources: Ro and Everyday Health write-ups of the Korean Switch-On diet.</span>`;
   const daily=`<div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>Every day, all 4 weeks</h3>
    <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:14px">
     <li>More than 8 cups (2 L) of water</li><li>6+ hours of sleep</li>
     <li>14:10 eating window: food only between 8 am and 6 pm (on non-fasting days)</li>
     <li>High-intensity exercise at least 4 times a week (not on days 1–3 or fast days)</li></ul></div>`;
-  const avoid=vg?`<li>All meat, fish, eggs and dairy</li><li>Hidden animal products: fish-sauce kimchi, anchovy broth (멸치육수), whey protein</li>`:`<li>Beef and pork (your choice)</li>`;
+  const avoid=vg?`<li>All meat, fish, eggs and dairy</li>${ind?"<li>Ghee, butter, cream, paneer, dahi</li><li>Besan (chickpea flour) and suji</li><li>Achar, papad, namkeen</li><li>Whey protein</li>":"<li>Hidden animal products: fish-sauce kimchi, anchovy broth (멸치육수), whey protein</li>"}`:`<li>Beef and pork (your choice)</li>`;
   const supps=vg?`<li><b>Vitamin B12</b> (essential on a vegan diet)</li><li>Algae omega-3 (instead of fish oil)</li><li>Vitamin D</li><li>Vegan multivitamin</li><li>Vitamin C</li><li>CoQ10 (choose a vegan capsule)</li>`:`<li>Multivitamin</li><li>Omega-3</li><li>Vitamin C</li><li>CoQ10</li>`;
   const rules=daily+`<div class="prog">
    <div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>Foods to avoid (all 4 weeks)</h3>
     <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:14px">
-     <li>Sugar and sugary foods and drinks</li><li>Milk with added sugar</li><li>Anything made with flour (bread, pasta, ramen, tteok, pancakes${vg?", seitan":""})</li><li>Caffeine in week 1 (later: 1 black coffee is fine)</li><li>Alcohol</li><li>Fried and fatty food</li>${avoid}<li>Artificial sweeteners</li><li>Salty foods</li></ul></div>
+     <li>Sugar and sugary foods and drinks</li><li>Milk with added sugar</li><li>Anything made with flour (bread, pasta, ramen, tteok, pancakes${ind?", roti, naan, paratha, puri":vg?", seitan":""})</li><li>Caffeine in week 1 (later: 1 black coffee is fine)</li><li>Alcohol</li><li>Fried and fatty food</li>${avoid}<li>Artificial sweeteners</li><li>Salty foods</li></ul></div>
    <div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>Supplements, morning and night</h3>
     <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:14px">${supps}</ul>
     <span class="muted" style="font-size:13px">The plan recommends supplements but doesn't give doses: follow each label. Ask a pharmacist first if you take any medication; CoQ10 and omega-3 can interact with blood thinners.${vg?" A dietitian can check your B12, iron and calcium.":""}</span></div></div>`;
@@ -1044,14 +1100,14 @@ function soSection(vg){
   const started=!!S.soStart;
   const today=started?Math.floor((new Date(iso(new Date()))-new Date(S.soStart))/864e5)+1:0;
   const view=soView||(started?Math.max(1,today):1);
-  const p=soPlan(view,vg),isToday=started&&view===today;
+  const p=soPlan(view,m),isToday=started&&view===today;
   const done=(S.soLog||{})[iso(new Date())]||0;
   const circles=isToday&&p.shakes?`<div class="row" id="soShakes" aria-label="Shakes drunk today">${Array.from({length:p.shakes},(_,k)=>`<button class="btn small ${k<done?"mint":"ghost"}" data-n="${k+1}" aria-pressed="${k<done}">🥤 ${k+1}</button>`).join("")}<span class="muted" style="font-size:13px">${done}/${p.shakes} shakes today</span></div>`:"";
   const nav=`<div class="row so-nav"><button class="btn small ghost" data-sonav="${view-1}" ${view<=1?"disabled":""} aria-label="Previous day">‹ Day ${Math.max(1,view-1)}</button>
     ${started&&!isToday&&today>=1?`<button class="btn small" data-sonav="today">Today</button>`:""}
     <button class="btn small ghost" data-sonav="${view+1}" ${view>=28?"disabled":""} aria-label="Next day">Day ${Math.min(28,view+1)} ›</button></div>`;
   const label=view>28?"Program complete":`Day ${view} of 28 · week ${p.wk}`+(isToday?" · TODAY":started?"":" · preview");
-  const guide=(p.fastDay||(SO_FAST[view+1]&&view<28))?fastGuide(vg):`<details class="card"><summary style="cursor:pointer;font-weight:700">How a 24-hour fast works</summary>${fastGuide(vg)}</details>`;
+  const guide=(p.fastDay||(SO_FAST[view+1]&&view<28))?fastGuide(m):`<details class="card"><summary style="cursor:pointer;font-weight:700">How a 24-hour fast works</summary>${fastGuide(m)}</details>`;
   return `<div class="card" id="soCard" style="display:flex;flex-direction:column;gap:12px">
    ${started?"":`<div style="display:flex;flex-direction:column;gap:8px"><h3>Your Switch-On tracker</h3><p class="muted" style="margin:0;font-size:14px">Press Start on the day you begin. Until then you can preview every day below.</p><div class="row"><button class="btn" id="soStart">Start my Switch-On today</button></div></div>`}
    <div class="row" style="justify-content:space-between"><div><span class="eyebrow">${label}</span><h3 style="font-size:20px">${esc(p.title)}</h3></div>${started?`<button class="btn small ghost" id="soRestart">Restart</button>`:""}</div>
