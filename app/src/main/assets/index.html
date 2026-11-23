@@ -859,38 +859,66 @@ function renderDiet(){
 }
 /* Switch-On 4-week program (common published schedule; details vary between sources) */
 const SO_FAST={11:1,16:1,20:1,23:1,25:1,27:1};
-// Schedule follows the Everyday Health description of the Korean Switch-On diet (pasted by the user).
-const LC="Low-carb meal: ½ bowl mixed grains (잡곡밥) with tofu, fish, sashimi, tuna, skinless chicken, eggs, tempeh, mushrooms or seaweed";
-const CF="Carb-free protein dinner: grilled or steamed fish, boiled skinless chicken, eggs or tofu (no rice or grains)";
-const SO_ADD={1:"Shakes only.",2:"New this week: beans and legumes, nuts, kimchi, 1 cup of black coffee in the morning, 2 cups of milk or unsweetened soy milk, non-salty cheese.",3:"New this week: pumpkin, tomatoes, chestnuts, bananas, berries. Bananas and sweet potatoes are OK on high-intensity exercise days.",4:"New this week: up to 1 serving of fruit a day."};
+// Schedule follows the Ro and Everyday Health write-ups of the Korean Switch-On diet (pasted by the user). No beef or pork (user's choice).
+const LC="Low-carb meal: ½ bowl mixed grains or brown rice (잡곡밥) with fish, tofu, skinless chicken, eggs, tempeh, mushrooms or seaweed";
+const CF="No-carb, high-protein dinner: grilled or steamed fish, skinless chicken, eggs or tofu with vegetables (no rice or grains)";
+const LCD="Low-carb dinner: lean protein (fish, chicken, eggs, tofu) + vegetables, with only a little grain or sweet potato";
+const SO_ADD={
+ 1:"If 4 shakes aren't enough: small amounts of plain yogurt, leafy vegetables or tofu. Green and herbal tea, olive or avocado oil are fine. No caffeine, wheat or dairy this week.",
+ 1.5:"Added from day 4: brown or mixed-grain rice, mushrooms, seaweed, low-sodium soy sauce, eggs, fish, skinless chicken. Still no caffeine, wheat or dairy.",
+ 2:"New this week: beans and legumes, quinoa, nuts, kimchi, unsalted natural cheese, milk or unsweetened soy milk, black coffee.",
+ 3:"New this week: tomatoes and berries. Sweet potato or banana before or after intense exercise.",
+ 4:"New this week: 1 serving of fruit a day. Dinner is now low-carb instead of no-carb."};
 function soPlan(d){
   const wk=d<=7?1:d<=14?2:d<=21?3:4;
-  const pre=SO_FAST[d+1]?"Tomorrow is a 24-hour fast: eat an early dinner tonight (e.g. by 6 pm).":null;
-  if(d>28)return{wk:5,title:"After the 4 weeks",shakes:0,slots:[["Breakfast","Protein breakfast or a shake"],["Lunch",LC],["Dinner","Protein + vegetables"]],eat:"The plan doesn't describe what to do after week 4. Keep the foods-to-avoid list and protein at every meal.",train:"Your normal 6-day training plan.",fast:false};
-  if(SO_FAST[d])return{wk,title:"24-hour fast day",shakes:1,slots:[["Breakfast","Fasting (water only); the fast began after last night's early dinner"],["Lunch","Fasting"],["Snack","Afternoon protein shake: this breaks the fast"],["Dinner",CF+", at your normal time"]],eat:wk===2?"Week 2 has 1 fast.":wk===3?"Week 3 has 2 fasts on non-consecutive days.":"Week 4 has 3 fasts on non-consecutive days.",train:"Rest, walking or gentle yoga only.",fast:true,note:"Move this fast to your Sunday or yoga day if it lands on a gym day."};
-  if(d<=3)return{wk,title:"Shakes only",shakes:4,slots:[["Breakfast","Protein shake"],["Lunch","Protein shake"],["Snack","Protein shake"],["Dinner","Protein shake"]],eat:SO_ADD[1],train:"Walking, stretching or gentle yoga only. No gym sessions on these 3 days.",fast:false,note:pre};
-  if(d<=7)return{wk,title:"Shakes + low-carb lunch",shakes:3,slots:[["Breakfast","Protein shake"],["Lunch",LC],["Snack","Afternoon protein shake"],["Dinner","Protein shake"]],eat:"Allowed: mixed grains (½ bowl at lunch), tofu, fish, sashimi, tuna, skinless chicken, eggs, tempeh, mushrooms, seaweed.",train:"Light gym work: Pilates, yoga, light machines, walking.",fast:false,note:pre};
-  return{wk,title:wk===2?"Week 2: first fast":wk===3?"Week 3: two fasts":"Week 4: three fasts",shakes:2,slots:[["Breakfast","Protein shake"],["Lunch",LC],["Snack","Afternoon protein shake"],["Dinner",CF]],eat:SO_ADD[wk],train:"Full training plan."+(wk>=3?" Have a banana or sweet potato before HIIT.":""),fast:false,note:pre};
+  const pre=SO_FAST[d+1]?"Tomorrow is a 24-hour fast: eat a filling high-protein dinner early tonight (by about 6 pm). See how the fast works below.":null;
+  if(d>28)return{wk:5,title:"After the 4 weeks",shakes:0,slots:[["Breakfast","Protein breakfast or a shake"],["Lunch",LC],["Dinner","Protein + vegetables"]],eat:"The plan doesn't describe what to do after week 4. Keep the 14:10 window, the foods-to-avoid list and protein at every meal.",train:"Your normal 6-day training plan.",fast:false};
+  if(SO_FAST[d])return{wk,title:"24-hour fast day",shakes:1,fastDay:true,slots:[["Breakfast","Fasting: no shake. Water, green or herbal tea"+(wk>=2?", or black coffee":"")],["Lunch","Fasting: water or tea only"],["Snack","3–4 pm: protein shake. This ends the fast"],["Dinner",(wk===4?LCD:CF)+", at your normal time"]],eat:wk===2?"Week 2 has 1 fast.":wk===3?"Week 3 has 2 fasts on non-consecutive days.":"Week 4 has 3 fasts on non-consecutive days.",train:"Rest, walking or gentle yoga only. Keep exercise moderate while fasting.",fast:true,note:"Move this fast to your Sunday or yoga day if it lands on a gym day."};
+  if(d<=3)return{wk,title:"Reset: shakes only",shakes:4,slots:[["Morning","Probiotic on an empty stomach"],["Breakfast","Protein shake"],["Lunch","Protein shake"],["Snack","Protein shake"],["Dinner","Protein shake"]],eat:SO_ADD[1],train:"Walk for at least 1 hour. No gym sessions on these 3 days.",fast:false,note:pre};
+  if(d<=7)return{wk,title:"Shakes + low-carb lunch",shakes:3,slots:[["Breakfast","Protein shake"],["Lunch",LC],["Snack","Afternoon protein shake"],["Dinner","Protein shake"]],eat:SO_ADD[1.5],train:"Walking plus light gym work: Pilates, yoga, light machines.",fast:false,note:pre};
+  return{wk,title:wk===2?"Week 2: first fast":wk===3?"Week 3: two fasts":"Week 4: three fasts",shakes:2,slots:[["Breakfast","Protein shake"],["Lunch",LC],["Snack","Afternoon protein shake"],["Dinner",wk===4?LCD:CF]],eat:SO_ADD[wk],train:"Full training plan, with high-intensity exercise at least 4 times this week."+(wk>=3?" Have a banana or sweet potato around HIIT.":""),fast:false,note:pre};
 }
+const FAST_GUIDE=`<div class="card" style="display:flex;flex-direction:column;gap:10px">
+  <h3>How a 24-hour fast works</h3>
+  <p class="muted" style="margin:0;font-size:14px">About 24 hours with nothing that has calories. You start after an early dinner and finish with the next day's afternoon shake, so most of the fast happens while you sleep. <b>A protein shake is food, so don't drink one until the afternoon: it ends the fast.</b></p>
+  <div style="overflow-x:auto"><table><tbody>
+   <tr><th style="width:120px">Day before, ~6 pm</th><td>Early, filling high-protein dinner (fish, chicken, eggs or tofu + vegetables). <b>Fast starts.</b></td></tr>
+   <tr><th>Night</th><td>Sleep. Nothing to eat.</td></tr>
+   <tr><th>Fast day, morning</th><td>No shake. Water, green, herbal or barley tea; black coffee from week 2.</td></tr>
+   <tr><th>Lunchtime</th><td>Still fasting: water or tea only.</td></tr>
+   <tr><th>3–4 pm</th><td><b>Protein shake: the fast is over</b> (about 22 hours).</td></tr>
+   <tr><th>Dinner, normal time</th><td>A filling high-protein, low-carb dinner to protect your muscle.</td></tr>
+  </tbody></table></div>
+  <div class="prog">
+   <div><span class="when" style="font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--accent-2)">ALLOWED WHILE FASTING</span><ul style="margin:4px 0 0;padding-left:20px;font-size:14px"><li>Water, sparkling water</li><li>Green, herbal, barley tea (no sugar)</li><li>Black coffee (from week 2)</li></ul></div>
+   <div><span class="when" style="font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--accent)">NOT ALLOWED</span><ul style="margin:4px 0 0;padding-left:20px;font-size:14px"><li>Protein shakes before the afternoon</li><li>Milk, soy milk, fruit, snacks</li><li>Sweetened or "zero" sweetener drinks</li></ul></div>
+  </div>
+  <span class="muted" style="font-size:13px">Week 2: 1 fast, week 3: 2, week 4: 3, never on two days in a row. Put them on your Sunday rest day or Saturday yoga day. If you feel dizzy, shaky or faint, drink your shake early and stop the fast. Hunger comes in waves and usually passes in 15–20 minutes.</span>
+ </div>`;
 function soSection(){
   const weeks=`<div style="overflow-x:auto"><table><thead><tr><th>Days</th><th>Breakfast</th><th>Lunch</th><th>Snack</th><th>Dinner</th><th>24-h fasts</th></tr></thead><tbody>
    <tr><td><b>1–3</b></td><td>Shake</td><td>Shake</td><td>Shake</td><td>Shake</td><td>–</td></tr>
    <tr><td><b>4–7</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>Shake</td><td>–</td></tr>
    <tr><td><b>Week 2</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>Carb-free protein</td><td class="n">1</td></tr>
    <tr><td><b>Week 3</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>Carb-free protein</td><td class="n">2</td></tr>
-   <tr><td><b>Week 4</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>Carb-free protein</td><td class="n">3</td></tr></tbody></table></div>
-   <span class="muted" style="font-size:12.5px">Low-carb meal = ½ bowl mixed grains + tofu, fish, skinless chicken, eggs, tempeh, mushrooms or seaweed. Carb-free dinner = fish, chicken, eggs or tofu. No beef or pork in this app's version. Fasts start after an early dinner and end with the next day's afternoon shake. Source: Everyday Health's description of the Korean Switch-On diet.</span>`;
-  const rules=`<div class="prog">
+   <tr><td><b>Week 4</b></td><td>Shake</td><td>Low-carb meal</td><td>Shake</td><td>Low-carb meal</td><td class="n">3</td></tr></tbody></table></div>
+   <span class="muted" style="font-size:12.5px">Low-carb meal = ½ bowl mixed grains + fish, tofu, skinless chicken, eggs, tempeh, mushrooms or seaweed. No-carb dinner = fish, chicken, eggs or tofu with vegetables. No beef or pork in this app's version. Fasts start after an early dinner and end with the next day's afternoon shake. Sources: Ro and Everyday Health write-ups of the Korean Switch-On diet.</span>`;
+  const daily=`<div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>Every day, all 4 weeks</h3>
+   <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:14px">
+    <li>More than 8 cups (2 L) of water</li><li>6+ hours of sleep</li>
+    <li>14:10 eating window: eat only within 10 hours, e.g. 8 am – 6 pm (on non-fasting days)</li>
+    <li>High-intensity exercise at least 4 times a week (not on days 1–3 or fast days)</li></ul></div>`;
+  const rules=daily+`<div class="prog">
    <div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>Foods to avoid (all 4 weeks)</h3>
     <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:14px">
-     <li>Sugar and sugary foods and drinks</li><li>Milk with added sugar</li><li>Anything made with flour (bread, noodles, tteok, pancakes)</li><li>Alcohol</li><li>Foods high in saturated or trans fat (fried food, chicken skin)</li><li>Beef and pork (your choice)</li><li>Artificial sweeteners</li><li>Salty foods</li></ul></div>
+     <li>Sugar and sugary foods and drinks</li><li>Milk with added sugar</li><li>Anything made with flour (bread, pasta, ramen, tteok, pancakes)</li><li>Caffeine in week 1 (later: 1 black coffee is fine)</li><li>Alcohol</li><li>Foods high in saturated or trans fat (fried food, chicken skin)</li><li>Beef and pork (your choice)</li><li>Artificial sweeteners</li><li>Salty foods</li></ul></div>
    <div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>Supplements, morning and night</h3>
     <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:14px"><li>Multivitamin</li><li>Omega-3</li><li>Vitamin C</li><li>CoQ10</li></ul>
     <span class="muted" style="font-size:13px">The plan recommends these but doesn't give doses: follow each label. Ask a pharmacist first if you take any medication; CoQ10 and omega-3 can interact with blood thinners.</span></div></div>`;
   const shake=`<div class="tip"><b>Shake:</b> 1 scoop whey or plant protein (about 20 g protein) with water or unsweetened soy milk, or a Korean diet shake. No added sugar or artificial sweeteners, as the plan avoids both.</div>`;
   if(!S.soStart)return `<div class="card" style="display:flex;flex-direction:column;gap:12px"><h3>Your Switch-On tracker</h3>
     <p class="muted" style="margin:0;font-size:14px">Start today and the app shows what to drink, eat and train each day for 28 days, and lets you tick off your shakes.</p>
-    <div class="row"><button class="btn" id="soStart">Start my Switch-On today</button></div>${weeks}${shake}</div>${rules}`;
+    <div class="row"><button class="btn" id="soStart">Start my Switch-On today</button></div>${weeks}${shake}</div>${rules}<details class="card"><summary style="cursor:pointer;font-weight:700">How a 24-hour fast works</summary>${FAST_GUIDE}</details>`;
   const d=Math.floor((new Date(iso(new Date()))-new Date(S.soStart))/864e5)+1;const p=soPlan(d);
   const done=(S.soLog||{})[iso(new Date())]||0;
   const circles=p.shakes?`<div class="row" id="soShakes" aria-label="Shakes drunk today">${Array.from({length:p.shakes},(_,k)=>`<button class="btn small ${k<done?"mint":"ghost"}" data-n="${k+1}" aria-pressed="${k<done}">🥤 ${k+1}</button>`).join("")}<span class="muted" style="font-size:13px">${done}/${p.shakes} shakes today</span></div>`:"";
@@ -904,8 +932,9 @@ function soSection(){
     <div class="meal"><span class="when">Train</span><span style="font-size:14px">${esc(p.train)}</span></div>
    </div>
    ${p.note?`<span class="muted" style="font-size:13px">${esc(p.note)}</span>`:""}
-   <details><summary style="cursor:pointer;font-weight:600">See all 4 weeks</summary>${weeks}</details>${shake}</div>${rules}
-  <div class="warn"><b>Before you start.</b> Days 1–3 are only about 600–700 kcal; dietitians call that below what's safe for most adults without medical supervision. Expect tiredness, headaches or dizziness, and keep those days to walking only. Never put a 24-hour fast on a gym day. Talk to a doctor or dietitian first if you have a health condition, take medication, have diabetes or low blood sugar, or have a history of disordered eating. Stop and eat normally if you feel faint or your period stops. The 4-week plan itself hasn't been tested in clinical trials.</div>`;
+   <details><summary style="cursor:pointer;font-weight:600">See all 4 weeks</summary>${weeks}</details>${shake}</div>
+  ${(p.fastDay||SO_FAST[d+1])?FAST_GUIDE:(d>=8&&d<=28?`<details class="card"><summary style="cursor:pointer;font-weight:700">How a 24-hour fast works</summary>${FAST_GUIDE}</details>`:"")}${rules}
+  <div class="warn"><b>Before you start.</b> Days 1–3 are only about 600–700 kcal; dietitians call that below what's safe for most adults without medical supervision. Expect tiredness, headaches or dizziness, and keep those days to walking only. Never put a 24-hour fast on a gym day: long fasts raise the risk of low blood sugar, so if you feel dizzy, shaky or faint, drink your shake early and stop the fast. Talk to a doctor or dietitian first if you have a health condition, take medication, have diabetes or low blood sugar, or have a history of disordered eating. Stop and eat normally if you feel faint or your period stops. The 4-week plan itself hasn't been tested in clinical trials.</div>`;
 }
 
 /* ---------- exercise sheet ---------- */
